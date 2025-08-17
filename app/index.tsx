@@ -190,11 +190,11 @@ function HomeContent() {
               <Text className="text-xs text-gray-600">Accent</Text>
             </View>
             <View className="items-center">
-              <View className="bg-success w-12 h-12 rounded-xl mb-1" />
+              <View className="bg-success-500 w-12 h-12 rounded-xl mb-1" />
               <Text className="text-xs text-gray-600">Success</Text>
             </View>
             <View className="items-center">
-              <View className="bg-error w-12 h-12 rounded-xl mb-1" />
+              <View className="bg-error-500 w-12 h-12 rounded-xl mb-1" />
               <Text className="text-xs text-gray-600">Error</Text>
             </View>
             <View className="items-center">
