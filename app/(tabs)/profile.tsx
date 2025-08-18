@@ -1,4 +1,5 @@
 import { View, Text, ScrollView, Alert } from 'react-native';
+import { router } from 'expo-router';
 import { ButtonText, Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Avatar, AvatarFallbackText } from '../../components/ui/avatar';
@@ -15,10 +16,12 @@ import {
 } from 'lucide-react-native';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
+import { useAuthStore } from '../../src/stores/authStore';
 
 export default function ProfileScreen() {
   const { colorScheme, toggleTheme } = useTheme();
   const colors = useThemeColors();
+  const { user, logout } = useAuthStore();
   const isDark = colorScheme === 'dark';
 
   const handleLogout = () => {
@@ -27,7 +30,14 @@ export default function ProfileScreen() {
       'Are you sure you want to logout?',
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Logout', style: 'destructive', onPress: () => console.log('Logged out') }
+        { 
+          text: 'Logout', 
+          style: 'destructive', 
+          onPress: async () => {
+            await logout();
+            router.replace('/(auth)/signin');
+          }
+        }
       ]
     );
   };
@@ -38,13 +48,15 @@ export default function ProfileScreen() {
       <Card className="p-6 mb-6">
         <View className="items-center">
           <Avatar size="xl" className="bg-primary-500 mb-4">
-            <AvatarFallbackText className="text-2xl">JD</AvatarFallbackText>
+            <AvatarFallbackText className="text-2xl">
+              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
+            </AvatarFallbackText>
           </Avatar>
           <Text className="text-2xl font-bold text-typography-900 mb-1">
-            John Doe
+            {user?.name || 'User'}
           </Text>
           <Text className="text-typography-600 mb-4">
-            Active Member • Joined Aug 2024
+            Active Member • {user?.role || 'USER'}
           </Text>
           <Button action="secondary" variant="outline" size="sm">
             <ButtonText>Edit Profile</ButtonText>
@@ -60,7 +72,7 @@ export default function ProfileScreen() {
         <View className="space-y-3">
           <View className="flex-row items-center">
             <Mail size={20} color={colors.icon.muted} />
-            <Text className="text-typography-700 ml-3">john.doe@email.com</Text>
+            <Text className="text-typography-700 ml-3">{user?.email || 'No email'}</Text>
           </View>
           <View className="flex-row items-center">
             <Phone size={20} color={colors.icon.muted} />

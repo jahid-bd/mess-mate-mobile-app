@@ -66,6 +66,14 @@ export function useThemeColors() {
       tertiary: isDark ? 'rgb(177, 56, 255)' : 'rgb(147, 51, 234)',
       muted: isDark ? 'rgb(163, 163, 163)' : 'rgb(107, 114, 126)',
       inverse: isDark ? 'rgb(23, 23, 23)' : 'rgb(255, 255, 255)',
+      danger: isDark ? 'rgb(239, 68, 68)' : 'rgb(230, 53, 53)',
+    },
+    
+    // Border colors
+    border: {
+      primary: isDark ? 'rgb(64, 64, 64)' : 'rgb(229, 229, 229)',
+      secondary: isDark ? 'rgb(82, 82, 82)' : 'rgb(212, 212, 212)',
+      focus: isDark ? 'rgb(249, 142, 47)' : 'rgb(234, 116, 14)',
     }
   };
 }
