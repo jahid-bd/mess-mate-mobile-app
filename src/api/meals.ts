@@ -1,8 +1,8 @@
 import { api } from './client';
-import { 
-  MealEntry, 
+import {
+  MealEntry,
   CreateMealEntryRequest,
-  PaginatedResponse 
+  PaginatedResponse,
 } from '../types/api';
 
 export const mealApi = {
@@ -24,7 +24,10 @@ export const mealApi = {
     return response.data;
   },
 
-  updateMealEntry: async (id: number, data: Partial<CreateMealEntryRequest>): Promise<MealEntry> => {
+  updateMealEntry: async (
+    id: number,
+    data: Partial<CreateMealEntryRequest>,
+  ): Promise<MealEntry> => {
     const response = await api.patch(`/meal-entries/${id}`, data);
     return response.data;
   },

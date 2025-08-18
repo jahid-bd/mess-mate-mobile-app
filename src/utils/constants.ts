@@ -4,14 +4,16 @@ export const API_CONFIG = {
   // For iOS Simulator: localhost
   // For Android Emulator: 10.0.2.2
   // For Physical Device: Your computer's IP address
-  BASE_URL: __DEV__ ? 'http://localhost:3000' : 'https://your-production-api.com',
+  BASE_URL: __DEV__
+    ? 'http://localhost:3000'
+    : 'https://your-production-api.com',
   TIMEOUT: 10000,
 };
 
 // Meal Types
 export const MEAL_TYPES = {
   BREAKFAST: 'BREAKFAST',
-  LUNCH: 'LUNCH', 
+  LUNCH: 'LUNCH',
   DINNER: 'DINNER',
   SHAHUR: 'SHAHUR',
 } as const;

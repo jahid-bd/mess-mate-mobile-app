@@ -26,7 +26,7 @@ api.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // Response interceptor for handling auth errors
@@ -39,7 +39,7 @@ api.interceptors.response.use(
       // You can add navigation logic here
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 export default api;

@@ -1,9 +1,5 @@
 import { api } from './client';
-import { 
-  Expense, 
-  CreateExpenseRequest,
-  PaginatedResponse 
-} from '../types/api';
+import { Expense, CreateExpenseRequest, PaginatedResponse } from '../types/api';
 
 export const expenseApi = {
   getExpenses: async (params?: {
@@ -24,7 +20,10 @@ export const expenseApi = {
     return response.data;
   },
 
-  updateExpense: async (id: number, data: Partial<CreateExpenseRequest>): Promise<Expense> => {
+  updateExpense: async (
+    id: number,
+    data: Partial<CreateExpenseRequest>,
+  ): Promise<Expense> => {
     const response = await api.patch(`/expenses/${id}`, data);
     return response.data;
   },

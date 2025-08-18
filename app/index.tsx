@@ -1,206 +1,124 @@
 import { View, Text, ScrollView } from 'react-native';
 import { useState } from 'react';
-import { 
-  Button, 
-  Input, 
-  Card, 
-  Modal, 
-  AlertModal, 
-  Loading, 
-  LoadingOverlay,
-  LoadingSkeleton as Skeleton,
-  CardSkeleton,
-  Toast,
-  ToastProvider,
-  useToast
-} from '../components/ui';
+import { ButtonText, Button } from '../components/ui/button';
+import { Input, InputField } from '../components/ui/input';
+import { Card } from '../components/ui/card';
+import { Avatar, AvatarImage, AvatarFallbackText } from '../components/ui/avatar';
+import { Spinner } from '../components/ui/spinner';
+import { Modal, ModalBackdrop, ModalContent, ModalHeader, ModalCloseButton, ModalBody, ModalFooter } from '../components/ui/modal';
+import { AlertDialog, AlertDialogBackdrop, AlertDialogContent, AlertDialogHeader, AlertDialogCloseButton, AlertDialogBody, AlertDialogFooter } from '../components/ui/alert-dialog';
+import { ToastProvider } from '@gluestack-ui/toast';
 
 function HomeContent() {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [alertVisible, setAlertVisible] = useState(false);
-  const [loadingVisible, setLoadingVisible] = useState(false);
-  const [toastVisible, setToastVisible] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const { showToast } = useToast();
-
-  const handleShowToast = (type: 'success' | 'error' | 'warning' | 'info') => {
-    showToast({
-      message: `This is a ${type} toast message!`,
-      type,
-      duration: 3000,
-    });
-  };
 
   return (
-    <ScrollView className="flex-1 bg-gray-50">
+    <ScrollView className="flex-1 bg-background-0">
       {/* Header Section */}
-      <View className="bg-gradient-to-br from-primary-500 to-primary-700 px-6 pt-12 pb-8">
+      <View className="bg-primary-500 px-6 pt-12 pb-8">
         <View className="mb-6">
           <Text className="text-4xl font-bold text-white mb-2">
-            MessMate UI Demo �
+            MessMate UI Demo 🍽️
           </Text>
           <Text className="text-primary-100 text-lg">
-            Complete component library showcase
+            Complete gluestack-ui component showcase
           </Text>
         </View>
       </View>
 
       <View className="px-6 py-6 -mt-4">
+        {/* Avatar Section */}
+        <Card className="p-4 mb-6">
+          <Text className="text-xl font-bold text-typography-900 mb-4">
+            Avatar Components
+          </Text>
+          <View className="flex-row space-x-4 items-center">
+            <Avatar className="bg-secondary-500">
+              <AvatarFallbackText>JD</AvatarFallbackText>
+            </Avatar>
+            <Avatar className="bg-primary-500">
+              <AvatarFallbackText>MS</AvatarFallbackText>
+            </Avatar>
+            <Avatar className="bg-tertiary-500">
+              <AvatarImage
+                source={{
+                  uri: 'https://images.unsplash.com/photo-1494790108755-2616b612b90e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80',
+                }}
+              />
+              <AvatarFallbackText>SS</AvatarFallbackText>
+            </Avatar>
+          </View>
+        </Card>
+
         {/* Button Components */}
-        <Card title="Button Components" className="mb-6">
+        <Card className="p-4 mb-6">
+          <Text className="text-xl font-bold text-typography-900 mb-4">
+            Button Components
+          </Text>
           <View className="space-y-3">
-            <Button
-              title="Primary Button"
-              onPress={() => handleShowToast('success')}
-              variant="primary"
-            />
-            <Button
-              title="Secondary Button"
-              onPress={() => handleShowToast('info')}
-              variant="secondary"
-            />
-            <Button
-              title="Outline Button"
-              onPress={() => handleShowToast('warning')}
-              variant="outline"
-            />
-            <Button
-              title="Ghost Button"
-              onPress={() => handleShowToast('error')}
-              variant="ghost"
-            />
-            <Button
-              title="Danger Button"
-              onPress={() => setAlertVisible(true)}
-              variant="danger"
-            />
-            <Button
-              title="Loading Button"
-              onPress={() => {}}
-              loading
-              variant="primary"
-            />
+            <Button action="primary" variant="solid">
+              <ButtonText>Primary Button</ButtonText>
+            </Button>
+            <Button action="secondary" variant="solid">
+              <ButtonText>Secondary Button</ButtonText>
+            </Button>
+            <Button action="positive" variant="outline">
+              <ButtonText>Success Outline</ButtonText>
+            </Button>
+            <Button action="negative" variant="link">
+              <ButtonText>Danger Link</ButtonText>
+            </Button>
           </View>
         </Card>
 
         {/* Input Components */}
-        <Card title="Input Components" className="mb-6">
+        <Card className="p-4 mb-6">
+          <Text className="text-xl font-bold text-typography-900 mb-4">
+            Input Components
+          </Text>
           <View className="space-y-4">
-            <Input
-              label="Basic Input"
-              placeholder="Enter your name"
-              value={inputValue}
-              onChangeText={setInputValue}
-            />
-            <Input
-              label="Email Input"
-              placeholder="Enter your email"
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            <Input
-              label="Password Input"
-              placeholder="Enter password"
-              secureTextEntry
-            />
-            <Input
-              label="Input with Error"
-              placeholder="This has an error"
-              error="This field is required"
-            />
-            <Input
-              label="Disabled Input"
-              placeholder="This is disabled"
-              disabled
-            />
-            <Input
-              label="Multiline Input"
-              placeholder="Enter your thoughts..."
-              multiline
-            />
-          </View>
-        </Card>
-
-        {/* Modal Components */}
-        <Card title="Modal Components" className="mb-6">
-          <View className="space-y-3">
-            <Button
-              title="Show Modal"
-              onPress={() => setModalVisible(true)}
-              variant="primary"
-            />
-            <Button
-              title="Show Alert"
-              onPress={() => setAlertVisible(true)}
-              variant="outline"
-            />
-            <Button
-              title="Show Loading Overlay"
-              onPress={() => {
-                setLoadingVisible(true);
-                setTimeout(() => setLoadingVisible(false), 2000);
-              }}
-              variant="secondary"
-            />
-          </View>
-        </Card>
-
-        {/* Card Variants */}
-        <Card title="Card Variants" className="mb-6">
-          <View className="space-y-4">
-            <Card variant="default" padding="sm">
-              <Text className="text-gray-700">Default Card</Text>
-            </Card>
-            <Card variant="outlined" padding="sm">
-              <Text className="text-gray-700">Outlined Card</Text>
-            </Card>
-            <Card variant="gradient" padding="sm">
-              <Text className="text-white">Gradient Card</Text>
-            </Card>
+            <Input>
+              <InputField
+                placeholder="Enter your name"
+                value={inputValue}
+                onChangeText={setInputValue}
+              />
+            </Input>
+            <Input variant="outline">
+              <InputField placeholder="Email address" />
+            </Input>
+            <Input>
+              <InputField placeholder="Password" secureTextEntry />
+            </Input>
           </View>
         </Card>
 
         {/* Loading Components */}
-        <Card title="Loading Components" className="mb-6">
-          <View className="space-y-4">
-            <Loading text="Basic Loading..." />
-            <View className="border border-gray-200 rounded-xl p-4">
-              <Text className="text-gray-700 mb-3 font-medium">Skeleton Loading:</Text>
-              <Skeleton height={24} width="60%" className="mb-2" />
-              <Skeleton height={16} width="100%" className="mb-2" />
-              <Skeleton height={16} width="80%" />
-            </View>
-            <CardSkeleton />
+        <Card className="p-4 mb-6">
+          <Text className="text-xl font-bold text-typography-900 mb-4">
+            Loading Components
+          </Text>
+          <View className="flex-row space-x-4 items-center">
+            <Spinner color="$primary500" />
+            <Spinner color="$secondary500" size="large" />
+            <Spinner color="$tertiary500" size="small" />
           </View>
         </Card>
 
-        {/* Theme Colors */}
-        <Card title="Theme Colors" className="mb-6">
-          <View className="flex-row flex-wrap gap-3">
-            <View className="items-center">
-              <View className="bg-primary-500 w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Primary</Text>
-            </View>
-            <View className="items-center">
-              <View className="bg-secondary-500 w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Secondary</Text>
-            </View>
-            <View className="items-center">
-              <View className="bg-accent-500 w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Accent</Text>
-            </View>
-            <View className="items-center">
-              <View className="bg-success-500 w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Success</Text>
-            </View>
-            <View className="items-center">
-              <View className="bg-error-500 w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Error</Text>
-            </View>
-            <View className="items-center">
-              <View className="bg-warning w-12 h-12 rounded-xl mb-1" />
-              <Text className="text-xs text-gray-600">Warning</Text>
-            </View>
+        {/* Modal & Alert Dialogs */}
+        <Card className="p-4 mb-6">
+          <Text className="text-xl font-bold text-typography-900 mb-4">
+            Modal & Alert Components
+          </Text>
+          <View className="space-y-3">
+            <Button onPress={() => setShowModal(true)} action="primary">
+              <ButtonText>Show Modal</ButtonText>
+            </Button>
+            <Button onPress={() => setShowAlert(true)} action="negative">
+              <ButtonText>Show Alert Dialog</ButtonText>
+            </Button>
           </View>
         </Card>
 
@@ -210,70 +128,58 @@ function HomeContent() {
             🚀 Complete UI Library Ready!
           </Text>
           <Text className="text-gray-300 mb-4">
-            All components built with modern design, full TypeScript support, and consistent theming.
+            All gluestack-ui components with beautiful orange-green theme, perfect for MessMate!
           </Text>
-          <Button
-            title="Start Building Features"
-            onPress={() => handleShowToast('success')}
-            variant="primary"
-            className="bg-white"
-          />
         </View>
       </View>
 
-      {/* Modals */}
-      <Modal
-        isVisible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        title="Demo Modal"
-        actions={
-          <View className="flex-row space-x-3">
-            <Button
-              title="Cancel"
-              onPress={() => setModalVisible(false)}
-              variant="ghost"
-              className="flex-1"
-            />
-            <Button
-              title="Confirm"
-              onPress={() => {
-                setModalVisible(false);
-                handleShowToast('success');
-              }}
-              variant="primary"
-              className="flex-1"
-            />
-          </View>
-        }
-      >
-        <Text className="text-gray-700 text-base leading-relaxed">
-          This is a demo modal with actions. You can customize the content, size, and behavior.
-        </Text>
+      {/* Modal */}
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <ModalBackdrop />
+        <ModalContent>
+          <ModalHeader>
+            <Text className="text-lg font-semibold">Demo Modal</Text>
+            <ModalCloseButton onPress={() => setShowModal(false)} />
+          </ModalHeader>
+          <ModalBody>
+            <Text>
+              This is a beautiful modal from gluestack-ui. You can add any content here!
+            </Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button action="secondary" onPress={() => setShowModal(false)}>
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button action="primary" onPress={() => setShowModal(false)}>
+              <ButtonText>Save</ButtonText>
+            </Button>
+          </ModalFooter>
+        </ModalContent>
       </Modal>
 
-      <AlertModal
-        isVisible={alertVisible}
-        onClose={() => setAlertVisible(false)}
-        title="Confirm Action"
-        message="Are you sure you want to proceed with this action?"
-        confirmText="Yes, Continue"
-        cancelText="Cancel"
-        variant="danger"
-        onConfirm={() => handleShowToast('success')}
-      />
-
-      <LoadingOverlay
-        isVisible={loadingVisible}
-        text="Processing your request..."
-      />
-
-      {toastVisible && (
-        <Toast
-          message="This is a demo toast!"
-          type="success"
-          onHide={() => setToastVisible(false)}
-        />
-      )}
+      {/* Alert Dialog */}
+      <AlertDialog isOpen={showAlert} onClose={() => setShowAlert(false)}>
+        <AlertDialogBackdrop />
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <Text className="text-lg font-semibold">Confirm Action</Text>
+            <AlertDialogCloseButton onPress={() => setShowAlert(false)} />
+          </AlertDialogHeader>
+          <AlertDialogBody>
+            <Text>
+              Are you sure you want to delete this meal entry? This action cannot be undone.
+            </Text>
+          </AlertDialogBody>
+          <AlertDialogFooter>
+            <Button action="secondary" onPress={() => setShowAlert(false)}>
+              <ButtonText>Cancel</ButtonText>
+            </Button>
+            <Button action="negative" onPress={() => setShowAlert(false)}>
+              <ButtonText>Delete</ButtonText>
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </ScrollView>
   );
 }

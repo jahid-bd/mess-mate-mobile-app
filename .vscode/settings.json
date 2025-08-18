@@ -3,5 +3,9 @@
     "source.fixAll": "explicit",
     "source.organizeImports": "explicit",
     "source.sortMembers": "explicit"
-  }
+  },
+
+  "editor.formatOnSave": true,
+  "prettier.enable": true,
+  "prettier.requireConfig": true
 }

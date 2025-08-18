@@ -60,7 +60,8 @@ Connects to NestJS backend running on `localhost:3000`. Update `src/utils/consta
 ## 📱 Development
 
 The app is set up for rapid development with:
+
 - Hot reloading
-- TypeScript support  
+- TypeScript support
 - ESLint configuration
 - Tailwind CSS classes

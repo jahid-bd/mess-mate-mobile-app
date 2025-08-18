@@ -9,7 +9,7 @@ interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   token: string | null;
-  
+
   // Actions
   setUser: (user: User) => void;
   setToken: (token: string) => void;
@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
 
       setUser: (user) => set({ user, isAuthenticated: true }),
-      
+
       setToken: async (token) => {
         await SecureStore.setItemAsync('authToken', token);
         set({ token });
@@ -35,10 +35,10 @@ export const useAuthStore = create<AuthState>()(
 
       logout: async () => {
         await SecureStore.deleteItemAsync('authToken');
-        set({ 
-          user: null, 
-          isAuthenticated: false, 
-          token: null 
+        set({
+          user: null,
+          isAuthenticated: false,
+          token: null,
         });
       },
 
@@ -61,10 +61,10 @@ export const useAuthStore = create<AuthState>()(
     {
       name: 'auth-storage',
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ 
+      partialize: (state) => ({
         user: state.user,
-        isAuthenticated: state.isAuthenticated 
+        isAuthenticated: state.isAuthenticated,
       }),
-    }
-  )
+    },
+  ),
 );

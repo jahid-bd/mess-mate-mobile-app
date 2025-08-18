@@ -1,6 +1,7 @@
 # MessMate Mobile - Development Roadmap
 
 ## 🎯 **Project Overview**
+
 Building a modern mess management system for shared living spaces with meal tracking, expense management, and monthly cost calculations.
 
 ---
@@ -8,6 +9,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## ✅ **Completed Tasks**
 
 ### 🏗️ **Project Setup**
+
 - [x] React Native + Expo project initialization
 - [x] NativeWind (Tailwind CSS) configuration
 - [x] TypeScript setup
@@ -22,6 +24,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 🚧 **Current Sprint - UI Foundation**
 
 ### 🎨 **Design System & Theme**
+
 - [x] Color palette (Primary, Secondary, Accent, Neutrals)
 - [x] Typography system
 - [x] Spacing and sizing tokens
@@ -31,6 +34,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Loading states and skeletons
 
 ### 📱 **Core Navigation & Layout**
+
 - [ ] Bottom tab navigation setup
 - [ ] Screen headers and layouts
 - [ ] Side drawer/menu (if needed)
@@ -41,6 +45,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 📋 **Next Sprint - Authentication Pages**
 
 ### 🔐 **Auth Screens**
+
 - [ ] Sign Up screen with validation
 - [ ] Sign In screen with validation
 - [ ] Password recovery flow
@@ -53,6 +58,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 🏠 **Dashboard & Core Features**
 
 ### 📊 **Dashboard Screen**
+
 - [ ] Monthly overview cards
 - [ ] Quick action buttons
 - [ ] Analytics charts/graphs
@@ -61,6 +67,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Personal cost summary
 
 ### 🍽️ **Meal Management**
+
 - [ ] Meal entries list screen
 - [ ] Add meal entry form
 - [ ] Edit meal entry screen
@@ -70,6 +77,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Meal filters and search
 
 ### 💰 **Expense Management**
+
 - [ ] Expenses list screen
 - [ ] Add expense form
 - [ ] Edit expense screen
@@ -79,6 +87,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Expense filters and search
 
 ### 📈 **Monthly Summary**
+
 - [ ] Monthly cost breakdown
 - [ ] Bill distribution view
 - [ ] Personal monthly summary
@@ -86,6 +95,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Export functionality
 
 ### 👥 **User Management (Admin)**
+
 - [ ] User list screen
 - [ ] Enable/disable users
 - [ ] Monthly calculation trigger
@@ -97,6 +107,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 🎨 **UI Components Library**
 
 ### 🧩 **Basic Components**
+
 - [ ] Button variants (Primary, Secondary, Outline, Ghost)
 - [ ] Input fields (Text, Number, Date, Select)
 - [ ] Cards and containers
@@ -105,6 +116,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Alert/Toast notifications
 
 ### 📊 **Data Display**
+
 - [ ] Tables with sorting/filtering
 - [ ] Charts and graphs
 - [ ] Statistics cards
@@ -113,6 +125,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Avatar components
 
 ### 🔧 **Form Components**
+
 - [ ] Form validation wrapper
 - [ ] Date/time pickers
 - [ ] Currency input
@@ -125,6 +138,7 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 🚀 **Advanced Features (Future)**
 
 ### 🏢 **Workspace System**
+
 - [ ] Multi-workspace support
 - [ ] Workspace creation/management
 - [ ] Email invitations
@@ -132,6 +146,7 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Workspace switching
 
 ### 📱 **Enhanced UX**
+
 - [ ] Profile picture upload
 - [ ] Phone number integration
 - [ ] Push notifications
@@ -139,12 +154,14 @@ Building a modern mess management system for shared living spaces with meal trac
 - [ ] Data synchronization
 
 ### 💬 **Communication**
+
 - [ ] In-app messaging
 - [ ] Notification system
 - [ ] Email integration
 - [ ] Real-time updates
 
 ### 🔄 **Automation**
+
 - [ ] Meal turn scheduling
 - [ ] Automated reminders
 - [ ] Smart calculations
@@ -155,18 +172,21 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 🛠️ **Technical Debt & Optimization**
 
 ### ⚡ **Performance**
+
 - [ ] Image optimization
 - [ ] Bundle size optimization
 - [ ] API caching strategies
 - [ ] Lazy loading implementation
 
 ### 🧪 **Testing**
+
 - [ ] Unit tests for utilities
 - [ ] Component testing
 - [ ] Integration tests
 - [ ] E2E testing setup
 
 ### 📱 **Platform Specific**
+
 - [ ] iOS specific optimizations
 - [ ] Android specific optimizations
 - [ ] Web responsive design
@@ -177,7 +197,9 @@ Building a modern mess management system for shared living spaces with meal trac
 ## 📅 **Release Planning**
 
 ### 🎯 **MVP (Minimum Viable Product)**
+
 **Target:** Basic mess management functionality
+
 - Authentication
 - Meal tracking
 - Expense management
@@ -185,14 +207,18 @@ Building a modern mess management system for shared living spaces with meal trac
 - Basic dashboard
 
 ### 📈 **V1.0 - Enhanced Features**
+
 **Target:** Complete core functionality
+
 - Advanced analytics
 - User management
 - Better UX/UI
 - Mobile optimizations
 
 ### 🚀 **V2.0 - Advanced Platform**
+
 **Target:** Full-featured platform
+
 - Multi-workspace support
 - Communication features
 - Automation

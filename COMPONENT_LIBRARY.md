@@ -1,11 +1,13 @@
 # MessMate Mobile - Component Library Documentation 📱
 
 ## Overview
+
 A complete React Native component library built with **Expo Router**, **NativeWind v2**, and **TypeScript** for the MessMate mess management system.
 
 ## 🎨 Design System
 
 ### Theme
+
 - **Modern Color Palette**: Primary (blue), secondary (indigo), accent (purple)
 - **Status Colors**: Success (green), error (red), warning (amber), info (cyan)
 - **Typography Scale**: Consistent font sizes and weights
@@ -14,6 +16,7 @@ A complete React Native component library built with **Expo Router**, **NativeWi
 - **Shadows**: Soft, medium, and strong elevation levels
 
 ### Utility
+
 - **cn() Function**: Elegant class merging using `clsx`
 - **Design Tokens**: Centralized theme configuration
 - **TypeScript**: Full type safety across all components
@@ -23,16 +26,19 @@ A complete React Native component library built with **Expo Router**, **NativeWi
 ### Core Components
 
 #### 1. Button
+
 ```tsx
 <Button variant="primary" size="md" loading={false}>
   Click me
 </Button>
 ```
+
 - **Variants**: primary, secondary, outline, ghost, danger
 - **Sizes**: sm, md, lg
 - **Features**: Loading states, icons, disabled state, full TypeScript props
 
 #### 2. Input
+
 ```tsx
 <Input
   label="Email"
@@ -43,29 +49,29 @@ A complete React Native component library built with **Expo Router**, **NativeWi
   error="Field is required"
 />
 ```
+
 - **Variants**: default, filled, outlined
 - **Features**: Labels, validation errors, helper text, icons, password toggle
 - **Types**: All React Native TextInput props supported
 
 #### 3. Card
+
 ```tsx
 <Card>
   <Card.Header>
     <Text>Title</Text>
   </Card.Header>
-  <Card.Content>
-    Content here
-  </Card.Content>
-  <Card.Footer>
-    Footer actions
-  </Card.Footer>
+  <Card.Content>Content here</Card.Content>
+  <Card.Footer>Footer actions</Card.Footer>
 </Card>
 ```
+
 - **Variants**: default, outlined, gradient
 - **Sections**: Header, Content, Footer
 - **Features**: Flexible padding, shadows, borders
 
 #### 4. Modal
+
 ```tsx
 <Modal visible={isVisible} onClose={() => setVisible(false)} title="Modal Title">
   Modal content
@@ -79,11 +85,13 @@ A complete React Native component library built with **Expo Router**, **NativeWi
   variant="danger"
 />
 ```
+
 - **Types**: Standard modal, Alert modal
 - **Features**: Backdrop blur, animations, action buttons
 - **Variants**: default, danger, warning, success
 
 #### 5. Loading & Skeletons
+
 ```tsx
 <Loading text="Loading..." />
 <LoadingOverlay visible={isLoading} text="Processing..." />
@@ -93,19 +101,22 @@ A complete React Native component library built with **Expo Router**, **NativeWi
 <SkeletonAvatar size={40} />
 <SkeletonCard />
 ```
+
 - **Components**: Loading spinner, overlay, skeleton placeholders
 - **Features**: Animated skeletons, customizable sizes, pre-built layouts
 
 #### 6. Toast Notifications
+
 ```tsx
 <ToastProvider>
   <App />
-</ToastProvider>
+</ToastProvider>;
 
 // Usage
 const { showSuccessToast, showErrorToast } = useToast();
 showSuccessToast('Operation successful!');
 ```
+
 - **Types**: success, error, warning, info
 - **Features**: Auto-dismiss, swipe to dismiss, queue management
 - **Hook**: `useToast()` for easy access
@@ -113,14 +124,19 @@ showSuccessToast('Operation successful!');
 ### Enhanced Components
 
 #### 7. Badge
+
 ```tsx
-<Badge variant="success" size="md">New</Badge>
+<Badge variant="success" size="md">
+  New
+</Badge>
 ```
+
 - **Variants**: default, success, warning, error, info, secondary
 - **Sizes**: sm, md, lg
 - **Features**: Rounded design, consistent colors
 
 #### 8. Avatar
+
 ```tsx
 <Avatar initials="JD" size="md" status="online" />
 <AvatarGroup max={3}>
@@ -130,12 +146,14 @@ showSuccessToast('Operation successful!');
   <Avatar initials="D4" />
 </AvatarGroup>
 ```
+
 - **Features**: Image support, initials fallback, status indicators
 - **Variants**: circular, rounded, square
 - **Sizes**: xs, sm, md, lg, xl, 2xl
 - **Group**: Stacked avatars with overflow counter
 
 #### 9. Tabs
+
 ```tsx
 <Tabs
   items={tabItems}
@@ -144,6 +162,7 @@ showSuccessToast('Operation successful!');
   variant="underline"
 />
 ```
+
 - **Variants**: default, pills, underline
 - **Features**: Badges, scrollable tabs, controlled/uncontrolled
 - **Responsive**: Works on all screen sizes
@@ -151,6 +170,7 @@ showSuccessToast('Operation successful!');
 ## 🚀 Getting Started
 
 ### Installation
+
 ```bash
 cd mobile
 npm install
@@ -158,24 +178,26 @@ npm start
 ```
 
 ### Import Components
+
 ```tsx
-import { 
-  Button, 
-  Input, 
-  Card, 
-  Modal, 
-  Badge, 
-  Avatar, 
+import {
+  Button,
+  Input,
+  Card,
+  Modal,
+  Badge,
+  Avatar,
   Tabs,
   Loading,
   Toast,
-  ToastProvider 
+  ToastProvider,
 } from '../components/ui';
 ```
 
 ## 🎯 Usage Examples
 
 ### Login Form
+
 ```tsx
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -202,7 +224,7 @@ function LoginForm() {
           leftIcon="lock-closed"
           showPasswordToggle
         />
-        <Button 
+        <Button
           onPress={() => showSuccessToast('Login successful!')}
           className="mt-4"
         >
@@ -215,6 +237,7 @@ function LoginForm() {
 ```
 
 ### Dashboard Card
+
 ```tsx
 function StatsCard() {
   return (
@@ -242,6 +265,7 @@ function StatsCard() {
 ## 📱 Demo App
 
 The main app (`app/index.tsx`) includes a comprehensive showcase of all components with:
+
 - **Interactive Examples**: Working buttons, forms, modals
 - **Visual Guide**: All variants, sizes, and states
 - **Live Testing**: Real functionality and state management
@@ -250,7 +274,9 @@ The main app (`app/index.tsx`) includes a comprehensive showcase of all componen
 ## 🎨 Customization
 
 ### Theme Customization
+
 Edit `src/theme/index.ts` to customize:
+
 - Colors and gradients
 - Typography scales
 - Spacing system
@@ -258,18 +284,21 @@ Edit `src/theme/index.ts` to customize:
 - Shadow definitions
 
 ### Tailwind Configuration
+
 Edit `tailwind.config.js` to:
+
 - Add custom colors
 - Extend spacing scale
 - Add custom animations
 - Configure responsive breakpoints
 
 ## 📂 File Structure
+
 ```
 components/ui/
 ├── index.ts              # Component exports
 ├── Button.tsx            # Button component
-├── Input.tsx             # Input component  
+├── Input.tsx             # Input component
 ├── Card.tsx              # Card component
 ├── Modal.tsx             # Modal components
 ├── Loading.tsx           # Loading components
@@ -289,6 +318,7 @@ src/
 ## ✅ Ready for MessMate Features
 
 The component library is now ready for building MessMate features:
+
 - **Authentication screens** with beautiful forms
 - **Dashboard** with stats cards and charts
 - **Meal tracking** with input forms and lists

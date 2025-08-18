@@ -17,7 +17,7 @@ export const COLORS = {
     800: '#075985',
     900: '#0c4a6e',
   },
-  
+
   // Secondary - Emerald Green
   secondary: {
     50: '#ecfdf5',
@@ -81,7 +81,7 @@ export const TYPOGRAPHY = {
     '4xl': 36,
     '5xl': 48,
   },
-  
+
   fontWeights: {
     normal: '400',
     medium: '500',
@@ -89,7 +89,7 @@ export const TYPOGRAPHY = {
     bold: '700',
     extrabold: '800',
   },
-  
+
   lineHeights: {
     tight: 1.25,
     normal: 1.5,

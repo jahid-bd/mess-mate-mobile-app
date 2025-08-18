@@ -1,10 +1,5 @@
 import { api } from './client';
-import { 
-  AuthResponse, 
-  LoginRequest, 
-  SignupRequest,
-  User 
-} from '../types/api';
+import { AuthResponse, LoginRequest, SignupRequest, User } from '../types/api';
 
 export const authApi = {
   login: async (credentials: LoginRequest): Promise<AuthResponse> => {
@@ -22,7 +17,10 @@ export const authApi = {
     return response.data;
   },
 
-  updateProfile: async (userId: number, updateData: Partial<User>): Promise<User> => {
+  updateProfile: async (
+    userId: number,
+    updateData: Partial<User>,
+  ): Promise<User> => {
     const response = await api.patch(`/user/${userId}`, updateData);
     return response.data;
   },
