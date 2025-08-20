@@ -67,6 +67,7 @@ export default function TabLayout() {
             <TabBarIcon Icon={UtensilsCrossed} color={color} focused={focused} />
           ),
           headerTitle: 'Meal Entries',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -77,6 +78,7 @@ export default function TabLayout() {
             <TabBarIcon Icon={DollarSign} color={color} focused={focused} />
           ),
           headerTitle: 'Expense Tracking',
+
         }}
       />
       <Tabs.Screen
@@ -94,6 +96,7 @@ export default function TabLayout() {
         options={{
           href: null, // Hide from tab bar
           headerTitle: 'Add Meal Entry',
+           headerShown: false,
         }}
       />
     </Tabs>

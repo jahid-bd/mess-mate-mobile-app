@@ -68,6 +68,7 @@ export interface CreateMealEntryRequest {
   amount: number;
   note?: string;
   type: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SHAHUR';
+  userId?: number; // Optional userId for admin to create meals for other users
 }
 
 export interface CreateExpenseRequest {

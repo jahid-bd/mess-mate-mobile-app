@@ -5,28 +5,38 @@ import {
   ScrollView, 
   KeyboardAvoidingView, 
   Platform,
-  Alert 
+  Alert
 } from 'react-native';
 import { router } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { X } from 'lucide-react-native';
 import { Button } from '../../components/ui/button';
 import { Input, InputField } from '../../components/ui/input';
 import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
+import { useAuthStore } from '../../src/stores/authStore';
+import { useActiveUsersQuery } from '../../src/hooks/useUsersQuery';
 import { mealApi } from '../../src/api/meals';
+import { DatePicker } from '../../src/components/DatePicker';
+import { UserSelector } from '../../src/components/UserSelector';
+import { ProfileHeader } from '@/src/components/ProfileHeader';
+import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
+import { X } from 'lucide-react-native';
 
 type MealType = 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SHAHUR';
 
 export default function AddMealEntry() {
   const colors = useThemeColors();
-  const insets = useSafeAreaInsets();
+  const { user } = useAuthStore();
+  const isAdmin = user?.role === 'ADMIN';
+  
+  // Fetch active users for admin
+  const { data: activeUsers = [], isLoading: usersLoading } = useActiveUsersQuery();
   
   const [formData, setFormData] = useState({
     type: 'LUNCH' as MealType,
-    amount: '1',
+    amount: 1, // Changed to integer
     note: '',
     date: new Date().toISOString().split('T')[0], // Today's date in YYYY-MM-DD format
+    userId: user?.id || null, // Default to current user
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
@@ -34,6 +44,7 @@ export default function AddMealEntry() {
     amount?: string;
     note?: string;
     date?: string;
+    userId?: string;
   }>({});
 
 const mealTypes: { label: string; value: MealType }[] = [
@@ -56,14 +67,16 @@ const getMealEmoji = (type: MealType): string => {
     default:
       return '🍽️';
   }
-};  const validateForm = () => {
+};
+
+  const validateForm = () => {
     const newErrors: typeof errors = {};
     
     if (!formData.type) {
       newErrors.type = 'Meal type is required';
     }
     
-    if (!formData.amount || isNaN(Number(formData.amount)) || Number(formData.amount) <= 0) {
+    if (!formData.amount || formData.amount <= 0) {
       newErrors.amount = 'Please enter a valid amount';
     }
     
@@ -71,6 +84,10 @@ const getMealEmoji = (type: MealType): string => {
       newErrors.date = 'Date is required';
     } else if (!/^\d{4}-\d{2}-\d{2}$/.test(formData.date)) {
       newErrors.date = 'Invalid date format';
+    }
+
+    if (isAdmin && !formData.userId) {
+      newErrors.userId = 'Please select a user';
     }
     
     setErrors(newErrors);
@@ -85,9 +102,10 @@ const getMealEmoji = (type: MealType): string => {
     try {
       await mealApi.createMealEntry({
         type: formData.type,
-        amount: Number(formData.amount),
+        amount: formData.amount,
         note: formData.note || undefined,
         date: formData.date,
+        userId: isAdmin ? formData.userId || undefined : undefined,
       });
       
       Alert.alert(
@@ -110,11 +128,20 @@ const getMealEmoji = (type: MealType): string => {
     router.back();
   };
 
+  const handleAmountChange = (text: string) => {
+    // Remove non-numeric characters except decimal point
+    const numericText = text.replace(/[^0-9.]/g, '');
+    const numValue = parseFloat(numericText) || 0;
+    setFormData(prev => ({ ...prev, amount: numValue }));
+  };
+
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
+      {/* Custom Header with Logo */}
+            <HeaderWithLogo title='Add Meal Entry' />
       <ScrollView
         style={{
           flex: 1,
@@ -123,11 +150,11 @@ const getMealEmoji = (type: MealType): string => {
         contentContainerStyle={{
           flexGrow: 1,
           padding: 24,
-          paddingTop: Math.max(24, insets.top + 24),
+          paddingTop: 24,
         }}
         keyboardShouldPersistTaps="handled"
       >
-        {/* Header */}
+           {/* Header */}
         <View style={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -135,7 +162,7 @@ const getMealEmoji = (type: MealType): string => {
           marginBottom: 32,
         }}>
           <Text style={{
-            fontSize: 24,
+            fontSize: 22,
             fontWeight: 'bold',
             color: colors.text.primary,
           }}>
@@ -151,10 +178,9 @@ const getMealEmoji = (type: MealType): string => {
               borderRadius: 20,
             }}
           >
-            <X size={20} color={colors.icon.secondary} />
+            <X size={20} color={colors.error[500]} />
           </Button>
         </View>
-
         <Card style={{ padding: 24 }}>
           <View style={{ gap: 24 }}>
             {/* Meal Type Selection */}
@@ -182,8 +208,11 @@ const getMealEmoji = (type: MealType): string => {
                       flex: 1,
                       minWidth: '45%',
                       backgroundColor: formData.type === mealType.value 
-                        ? colors.icon.primary 
+                        ? colors.primary[500] 
                         : 'transparent',
+                      borderColor: formData.type === mealType.value 
+                        ? colors.primary[500] 
+                        : colors.border.primary,
                     }}
                   >
                     <Text style={{
@@ -216,16 +245,21 @@ const getMealEmoji = (type: MealType): string => {
               </Text>
               <Input
                 variant="outline"
-                size="lg"
+               
                 style={{
                   borderColor: errors.amount ? colors.icon.danger : colors.border.primary,
                 }}
               >
                 <InputField
-                  placeholder="Enter meal amount (e.g., 1, 0.5)"
-                  value={formData.amount}
-                  onChangeText={(text: string) => setFormData(prev => ({ ...prev, amount: text }))}
+                  placeholder="Enter meal amount (e.g., 1, 2)"
+                  value={formData.amount.toString()}
+                  onChangeText={handleAmountChange}
                   keyboardType="numeric"
+                  style={{
+                    fontSize: 16,
+                   
+                  }}
+                  size='xl'
                 />
               </Input>
               {errors.amount && (
@@ -238,7 +272,7 @@ const getMealEmoji = (type: MealType): string => {
                 color: colors.text.secondary,
                 marginTop: 4,
               }}>
-                Enter 1 for full meal, 0.5 for half meal, etc.
+                Enter the number of meals (e.g., 1, 2)
               </Text>
             </View>
 
@@ -252,32 +286,43 @@ const getMealEmoji = (type: MealType): string => {
               }}>
                 Date
               </Text>
-              <Input
-                variant="outline"
-                size="lg"
-                style={{
-                  borderColor: errors.date ? colors.icon.danger : colors.border.primary,
-                }}
-              >
-                <InputField
-                  placeholder="YYYY-MM-DD"
-                  value={formData.date}
-                  onChangeText={(text: string) => setFormData(prev => ({ ...prev, date: text }))}
-                />
-              </Input>
-              {errors.date && (
-                <Text style={{ color: colors.icon.danger, fontSize: 12, marginTop: 4 }}>
-                  {errors.date}
-                </Text>
-              )}
-              <Text style={{
-                fontSize: 12,
-                color: colors.text.secondary,
-                marginTop: 4,
-              }}>
-                Format: YYYY-MM-DD (e.g., 2025-08-19)
-              </Text>
+              <DatePicker
+                value={formData.date}
+                onDateChange={(date) => setFormData(prev => ({ ...prev, date }))}
+                placeholder="Select date"
+                error={errors.date}
+              />
             </View>
+
+            {/* User Selection (Admin Only) */}
+            {isAdmin && (
+              <View>
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '600',
+                  color: colors.text.primary,
+                  marginBottom: 8,
+                }}>
+                  User
+                </Text>
+                <UserSelector
+                  users={activeUsers}
+                  selectedUserId={formData.userId}
+                  onUserSelect={(userId) => setFormData(prev => ({ ...prev, userId }))}
+                  placeholder="Select user"
+                  error={errors.userId}
+                  currentUserId={user?.id}
+                  showCurrentUserFirst={true}
+                />
+                <Text style={{
+                  fontSize: 12,
+                  color: colors.text.secondary,
+                  marginTop: 4,
+                }}>
+                  Select which user this meal entry is for
+                </Text>
+              </View>
+            )}
 
             {/* Note (Optional) */}
             <View>
@@ -291,15 +336,20 @@ const getMealEmoji = (type: MealType): string => {
               </Text>
               <Input
                 variant="outline"
-                size="lg"
+                size="md"
               >
                 <InputField
                   placeholder="Add any notes about this meal..."
                   value={formData.note}
                   onChangeText={(text: string) => setFormData(prev => ({ ...prev, note: text }))}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
+                  // multiline
+                  // numberOfLines={3}
+                  // textAlignVertical="top"
+                  // style={{
+                  //   fontSize: 16,
+                  //   paddingVertical: 14,
+                  //   minHeight: 80,
+                  // }}
                 />
               </Input>
             </View>
@@ -308,9 +358,10 @@ const getMealEmoji = (type: MealType): string => {
             <View style={{ gap: 12, marginTop: 8 }}>
               <Button
                 onPress={handleSubmit}
-                disabled={isLoading}
+                disabled={isLoading || usersLoading}
                 style={{
-                  backgroundColor: colors.icon.primary,
+                   backgroundColor: colors.icon.primary,
+                
                 }}
               >
                 <Text style={{ 
@@ -326,6 +377,11 @@ const getMealEmoji = (type: MealType): string => {
                 variant="outline"
                 onPress={handleCancel}
                 disabled={isLoading}
+                // style={{
+                //   borderColor: colors.border.primary,
+                //   paddingVertical: 16,
+                //   backgroundColor: 'transparent',
+                // }}
               >
                 <Text style={{ 
                   color: colors.text.primary, 

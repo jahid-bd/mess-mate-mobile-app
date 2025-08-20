@@ -15,6 +15,8 @@ import {
   MealsHeader,
   type MealStats,
 } from '../../src/components/meals';
+import { Header } from '@react-navigation/elements';
+import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
 
 export default function MealsScreen() {
   const colors = useThemeColors();
@@ -226,6 +228,8 @@ export default function MealsScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <HeaderWithLogo title='Meal Entries' />
+
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}

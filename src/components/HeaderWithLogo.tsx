@@ -8,11 +8,13 @@ import { useThemeColors } from '../hooks/useThemeColors';
 interface HeaderWithLogoProps {
   showNotification?: boolean;
   onNotificationPress?: () => void;
+  title?: string
 }
 
 export function HeaderWithLogo({ 
   showNotification = true, 
-  onNotificationPress 
+  onNotificationPress,
+  title = 'Dashboard'
 }: HeaderWithLogoProps) {
   const colors = useThemeColors();
   const insets = useSafeAreaInsets();
@@ -47,7 +49,7 @@ export function HeaderWithLogo({
           textTransform: 'uppercase',
           letterSpacing: 0.5,
         }}>
-          Dashboard
+          {title}
         </Text>
       </View>
 
