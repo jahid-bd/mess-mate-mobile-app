@@ -1,51 +1,20 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, RefreshControl, Alert, ActionSheetIOS, Platform } from 'react-native';
+import { View, ScrollView, RefreshControl, Alert, ActionSheetIOS, Platform } from 'react-native';
 import { router } from 'expo-router';
-import { ButtonText, Button } from '../../components/ui/button';
-import { Card } from '../../components/ui/card';
-import { 
-  Plus, 
-  Filter, 
-  Calendar,
-  User,
-  MoreVertical,
-  Clock,
-  TrendingUp,
-  Coffee,
-  Sun,
-  Moon,
-  Utensils
-} from 'lucide-react-native';
+import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
 import { MonthPicker } from '../../src/components/MonthPicker';
 import { UserPicker } from '../../src/components/UserPicker';
-
-// Mock data types based on your backend
-interface MealEntry {
-  id: number;
-  date: string;
-  amount: number;
-  note?: string;
-  type: 'BREAKFAST' | 'LUNCH' | 'DINNER' | 'SHAHUR';
-  userId: number;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface MealStats {
-  totalMeals: number;
-  todayMeals: number;
-  weeklyMeals: number;
-  monthlyMeals: number;
-  averagePerDay: number;
-  userMeals: number;
-}
+import {
+  MealStatistics,
+  MealFiltersCard,
+  MealsList,
+  MealsHeader,
+  type MealEntry,
+  type MealStats,
+  type User,
+} from '../../src/components/meals';
 
 export default function MealsScreen() {
   const colors = useThemeColors();
@@ -73,7 +42,7 @@ export default function MealsScreen() {
     userMeals: 23,
   };
 
-  const mockUsers = [
+  const mockUsers: User[] = [
     { id: 1, name: 'John Doe', email: 'john@example.com' },
     { id: 2, name: 'Maria Smith', email: 'maria@example.com' },
     { id: 3, name: 'Ahmed Khan', email: 'ahmed@example.com' },
@@ -127,45 +96,12 @@ export default function MealsScreen() {
     },
   ];
 
-  // Helper functions
-  const getMealIcon = (type: string) => {
-    switch (type) {
-      case 'BREAKFAST': return <Coffee size={16} color={colors.warning[600]} />;
-      case 'LUNCH': return <Sun size={16} color={colors.primary[600]} />;
-      case 'DINNER': return <Moon size={16} color={colors.tertiary[600]} />;
-      case 'SHAHUR': return <Clock size={16} color={colors.secondary[600]} />;
-      default: return <Utensils size={16} color={colors.icon.muted} />;
-    }
-  };
-
-  const formatDateWithDay = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    
-    if (date.toDateString() === today.toDateString()) {
-      return 'Today';
-    } else if (date.toDateString() === new Date(today.getTime() - 86400000).toDateString()) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-US', { 
-        weekday: 'long',
-        month: 'long', 
-        day: 'numeric',
-        year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined 
-      });
-    }
-  };
-
-  const canEditMeal = (meal: MealEntry) => {
-    return isAdmin || meal.userId === user?.id;
-  };
-
+  // Event handlers
   const handleAddMeal = () => {
     router.push('/(tabs)/add-meal');
   };
 
   const handleEditMeal = (meal: MealEntry) => {
-    // Navigate to edit meal screen
     router.push(`/(tabs)/add-meal?id=${meal.id}&mode=edit`);
   };
 
@@ -204,7 +140,6 @@ export default function MealsScreen() {
         }
       );
     } else {
-      // For Android, show alert with options
       Alert.alert(
         'Meal Actions',
         'What would you like to do?',
@@ -223,6 +158,7 @@ export default function MealsScreen() {
     setTimeout(() => setIsRefreshing(false), 1000);
   };
 
+  // Data processing
   const filteredMeals = mockMeals
     .filter(meal => !showOnlyMyMeals || meal.userId === user?.id)
     .filter(meal => !selectedUser || meal.userId === selectedUser)
@@ -242,12 +178,6 @@ export default function MealsScreen() {
       return sortOrder === 'asc' ? comparison : -comparison;
     });
 
-  const getSelectedUserName = () => {
-    if (!selectedUser) return 'All Users';
-    const user = mockUsers.find(u => u.id === selectedUser);
-    return user ? user.name : 'All Users';
-  };
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
       <ScrollView
@@ -262,454 +192,52 @@ export default function MealsScreen() {
         }
       >
         {/* Header Actions */}
-        <View style={{ flexDirection: 'row', gap: 12, marginBottom: 16 }}>
-          <Button 
-            action="primary" 
-            variant="solid" 
-            style={{ flex: 1, height: 40 }}
-            onPress={handleAddMeal}
-          >
-            <Plus size={20} color={colors.text.inverse} />
-            <ButtonText style={{ marginLeft: 8, color: colors.text.inverse }}>
-              Add Meal Entry
-            </ButtonText>
-          </Button>
-          
-          <Button 
-            action={showFilters ? "primary" : "default"}
-            variant={showFilters ? "solid" : "outline"}
-            style={{ 
-              width: 42, 
-              height: 42,
-              borderColor: showFilters ? colors.primary[500] : colors.border.primary,
-              backgroundColor: showFilters ? colors.primary[100] : 'transparent'
-            }}
-            onPress={() => setShowFilters(!showFilters)}
-          >
-            <Filter size={20} color={showFilters ? colors.primary[600] : colors.icon.muted} />
-          </Button>
-        </View>
+        <MealsHeader
+          showFilters={showFilters}
+          onAddMeal={handleAddMeal}
+          onToggleFilters={() => setShowFilters(!showFilters)}
+        />
 
         {/* Meal Statistics */}
-        <View style={{ marginBottom: 20 }}>
-          <Text style={{ 
-            fontSize: 18, 
-            fontWeight: '600', 
-            color: colors.text.primary, 
-            marginBottom: 12 
-          }}>
-            Meal Statistics
-          </Text>
-          
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-            <Card style={{ 
-              flex: 1, 
-              padding: 12,
-              backgroundColor: colors.background.primary,
-              borderWidth: 1,
-              borderColor: colors.border.primary
-            }}>
-              <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-                Today
-              </Text>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.primary[600] }}>
-                {mockStats.todayMeals}
-              </Text>
-            </Card>
-            
-            <Card style={{ 
-              flex: 1, 
-              padding: 12,
-              backgroundColor: colors.background.primary,
-              borderWidth: 1,
-              borderColor: colors.border.primary
-            }}>
-              <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-                This Week
-              </Text>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.secondary[600] }}>
-                {mockStats.weeklyMeals}
-              </Text>
-            </Card>
-            
-            <Card style={{ 
-              flex: 1, 
-              padding: 12,
-              backgroundColor: colors.background.primary,
-              borderWidth: 1,
-              borderColor: colors.border.primary
-            }}>
-              <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-                This Month
-              </Text>
-              <Text style={{ fontSize: 20, fontWeight: 'bold', color: colors.tertiary[600] }}>
-                {mockStats.monthlyMeals}
-              </Text>
-            </Card>
-          </View>
-
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Card style={{ 
-              flex: 1, 
-              padding: 12,
-              backgroundColor: colors.background.primary,
-              borderWidth: 1,
-              borderColor: colors.border.primary
-            }}>
-              <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-                Total Entries
-              </Text>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <TrendingUp size={14} color={colors.success[600]} />
-                <Text style={{ 
-                  fontSize: 16, 
-                  fontWeight: 'bold', 
-                  color: colors.success[600],
-                  marginLeft: 4 
-                }}>
-                  {mockStats.totalMeals}
-                </Text>
-              </View>
-            </Card>
-            
-            {!isAdmin && (
-              <Card style={{ 
-                flex: 1, 
-                padding: 12,
-                backgroundColor: colors.background.primary,
-                borderWidth: 1,
-                borderColor: colors.border.primary
-              }}>
-                <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-                  My Meals
-                </Text>
-                <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.warning[600] }}>
-                  {mockStats.userMeals}
-                </Text>
-              </Card>
-            )}
-          </View>
-        </View>
+        <MealStatistics
+          stats={mockStats}
+          isAdmin={isAdmin}
+        />
 
         {/* Filters */}
         {showFilters && (
-          <Card style={{ 
-            padding: 16, 
-            marginBottom: 16,
-            backgroundColor: colors.background.primary,
-            borderWidth: 1,
-            borderColor: colors.border.primary
-          }}>
-            <Text style={{ 
-              fontSize: 16, 
-              fontWeight: '600', 
-              color: colors.text.primary, 
-              marginBottom: 12 
-            }}>
-              Filters & Sorting
-            </Text>
-            
-            <View style={{ gap: 12 }}>
-              {/* Month Filter */}
-              <View>
-                <Text style={{ 
-                  fontSize: 14, 
-                  color: colors.text.secondary, 
-                  marginBottom: 8 
-                }}>
-                  Month
-                </Text>
-                <Button 
-                  action="default" 
-                  variant="outline"
-                  style={{ 
-                    justifyContent: 'flex-start',
-                    borderColor: colors.border.primary,
-                    backgroundColor: 'transparent'
-                  }}
-                  onPress={() => setShowMonthPicker(true)}
-                >
-                  <Calendar size={16} color={colors.icon.muted} />
-                  <ButtonText style={{ marginLeft: 8, color: colors.text.primary }}>
-                    {selectedMonth}
-                  </ButtonText>
-                </Button>
-              </View>
-
-              {/* Person Filter */}
-              <View>
-                <Text style={{ 
-                  fontSize: 14, 
-                  color: colors.text.secondary, 
-                  marginBottom: 8 
-                }}>
-                  Filter by Person
-                </Text>
-                <Button 
-                  action="secondary" 
-                  variant="outline"
-                  style={{ 
-                    justifyContent: 'flex-start',
-                    borderColor: colors.border.primary,
-                    backgroundColor: 'transparent'
-                  }}
-                  onPress={() => setShowUserPicker(true)}
-                >
-                  <User size={16} color={colors.icon.muted} />
-                  <ButtonText style={{ marginLeft: 8, color: colors.text.primary }}>
-                    {getSelectedUserName()}
-                  </ButtonText>
-                </Button>
-              </View>
-
-              {/* Toggle My Meals Only */}
-              {!isAdmin && (
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                  <Button 
-                    action={showOnlyMyMeals ? "primary" : "secondary"}
-                    variant={showOnlyMyMeals ? "solid" : "outline"}
-                    size="sm"
-                    style={{
-                      borderColor: showOnlyMyMeals ? undefined : colors.border.primary,
-                      backgroundColor: showOnlyMyMeals ? undefined : 'transparent'
-                    }}
-                    onPress={() => setShowOnlyMyMeals(!showOnlyMyMeals)}
-                  >
-                    <User size={16} color={showOnlyMyMeals ? colors.text.inverse : colors.icon.muted} />
-                    <ButtonText style={{ 
-                      marginLeft: 8,
-                      color: showOnlyMyMeals ? colors.text.inverse : colors.text.primary 
-                    }}>
-                      My Meals Only
-                    </ButtonText>
-                  </Button>
-                </View>
-              )}
-
-              {/* Sort Options */}
-              <View>
-                <Text style={{ 
-                  fontSize: 14, 
-                  color: colors.text.secondary, 
-                  marginBottom: 8 
-                }}>
-                  Sort by
-                </Text>
-                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-                  {['date', 'type', 'user'].map((option) => (
-                    <Button
-                      key={option}
-                      action={sortBy === option ? "primary" : "secondary"}
-                      variant={sortBy === option ? "solid" : "outline"}
-                      size="sm"
-                      onPress={() => setSortBy(option as any)}
-                    >
-                      <ButtonText style={{ 
-                        color: sortBy === option ? colors.text.inverse : colors.text.primary 
-                      }}>
-                        {option.charAt(0).toUpperCase() + option.slice(1)}
-                      </ButtonText>
-                    </Button>
-                  ))}
-                </View>
-                
-                {/* Sort Order */}
-                <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <Button
-                    action={sortOrder === 'desc' ? "primary" : "secondary"}
-                    variant={sortOrder === 'desc' ? "solid" : "outline"}
-                    size="sm"
-                    onPress={() => setSortOrder('desc')}
-                  >
-                    <ButtonText style={{ 
-                      color: sortOrder === 'desc' ? colors.text.inverse : colors.text.primary 
-                    }}>
-                      Newest First
-                    </ButtonText>
-                  </Button>
-                  <Button
-                    action={sortOrder === 'asc' ? "primary" : "secondary"}
-                    variant={sortOrder === 'asc' ? "solid" : "outline"}
-                    size="sm"
-                    onPress={() => setSortOrder('asc')}
-                  >
-                    <ButtonText style={{ 
-                      color: sortOrder === 'asc' ? colors.text.inverse : colors.text.primary 
-                    }}>
-                      Oldest First
-                    </ButtonText>
-                  </Button>
-                </View>
-              </View>
-            </View>
-          </Card>
+          <MealFiltersCard
+            selectedMonth={selectedMonth}
+            showOnlyMyMeals={showOnlyMyMeals}
+            selectedUser={selectedUser}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            isAdmin={isAdmin}
+            users={mockUsers}
+            onMonthPickerOpen={() => setShowMonthPicker(true)}
+            onUserPickerOpen={() => setShowUserPicker(true)}
+            onToggleMyMeals={() => setShowOnlyMyMeals(!showOnlyMyMeals)}
+            onSortByChange={setSortBy}
+            onSortOrderChange={setSortOrder}
+          />
         )}
 
         {/* Meal Entries List */}
-        <View style={{ marginBottom: 16 }}>
-          <View style={{ 
-            flexDirection: 'row', 
-            justifyContent: 'space-between', 
-            alignItems: 'center',
-            marginBottom: 12 
-          }}>
-            <Text style={{ 
-              fontSize: 18, 
-              fontWeight: '600', 
-              color: colors.text.primary 
-            }}>
-              Meal Entries
-            </Text>
-            <Text style={{ 
-              fontSize: 14, 
-              color: colors.text.secondary 
-            }}>
-              {filteredMeals.length} entries
-            </Text>
-          </View>
-
-          {filteredMeals.length === 0 ? (
-            <Card style={{ 
-              padding: 32, 
-              alignItems: 'center',
-              backgroundColor: colors.background.primary,
-              borderWidth: 1,
-              borderColor: colors.border.primary
-            }}>
-              <Utensils size={48} color={colors.icon.muted} />
-              <Text style={{ 
-                fontSize: 16, 
-                color: colors.text.secondary, 
-                textAlign: 'center',
-                marginTop: 12,
-                marginBottom: 16
-              }}>
-                {showOnlyMyMeals 
-                  ? "You haven't added any meals yet"
-                  : "No meal entries found for the selected period"
-                }
-              </Text>
-              <Button action="primary" variant="solid" onPress={handleAddMeal}>
-                <Plus size={20} color={colors.text.inverse} />
-                <ButtonText style={{ marginLeft: 8, color: colors.text.inverse }}>
-                  Add Your First Meal
-                </ButtonText>
-              </Button>
-            </Card>
-          ) : (
-            <View style={{ gap: 8 }}>
-              {filteredMeals.map((meal, index) => (
-                <Card key={meal.id} style={{ 
-                  padding: 16,
-                  backgroundColor: colors.background.primary,
-                  borderWidth: 1,
-                  borderColor: colors.border.primary
-                }}>
-                  <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                    <View style={{ flex: 1 }}>
-                      {/* Meal Type and Amount */}
-                      <View style={{ 
-                        flexDirection: 'row', 
-                        alignItems: 'center', 
-                        marginBottom: 8 
-                      }}>
-                        {getMealIcon(meal.type)}
-                        <Text style={{ 
-                          fontSize: 16, 
-                          fontWeight: '600', 
-                          color: colors.text.primary,
-                          marginLeft: 8 
-                        }}>
-                          {meal.type.charAt(0) + meal.type.slice(1).toLowerCase()}
-                        </Text>
-                        <View style={{
-                          backgroundColor: colors.primary[100],
-                          paddingHorizontal: 8,
-                          paddingVertical: 2,
-                          borderRadius: 12,
-                          marginLeft: 8
-                        }}>
-                          <Text style={{ 
-                            fontSize: 12, 
-                            fontWeight: '600',
-                            color: colors.primary[700]
-                          }}>
-                            {meal.amount} meal{meal.amount > 1 ? 's' : ''}
-                          </Text>
-                        </View>
-                      </View>
-
-                      {/* User Info */}
-                      <View style={{ 
-                        flexDirection: 'row', 
-                        alignItems: 'center', 
-                        marginBottom: 4 
-                      }}>
-                        <User size={14} color={colors.icon.muted} />
-                        <Text style={{ 
-                          fontSize: 14, 
-                          color: colors.text.secondary,
-                          marginLeft: 6 
-                        }}>
-                          {meal.user.name}
-                          {meal.userId === user?.id && (
-                            <Text style={{ color: colors.primary[600] }}> (You)</Text>
-                          )}
-                        </Text>
-                      </View>
-
-                      {/* Date */}
-                      <Text style={{ 
-                        fontSize: 13, 
-                        color: colors.text.secondary,
-                        marginBottom: 4
-                      }}>
-                        {formatDateWithDay(meal.date)}
-                      </Text>
-
-                      {/* Note */}
-                      {meal.note && (
-                        <Text style={{ 
-                          fontSize: 12, 
-                          color: colors.text.tertiary,
-                          fontStyle: 'italic',
-                          marginTop: 4 
-                        }}>
-                          &ldquo;{meal.note}&rdquo;
-                        </Text>
-                      )}
-                    </View>
-
-                    {/* Action Button */}
-                    {canEditMeal(meal) && (
-                      <Button 
-                        action="secondary" 
-                        variant="outline"
-                        size="sm"
-                        style={{ 
-                          width: 40, 
-                          height: 40,
-                          borderColor: colors.border.primary,
-                          backgroundColor: 'transparent'
-                        }}
-                        onPress={() => showMealActions(meal)}
-                      >
-                        <MoreVertical size={16} color={colors.icon.muted} />
-                      </Button>
-                    )}
-                  </View>
-                </Card>
-              ))}
-            </View>
-          )}
-        </View>
+        <MealsList
+          meals={filteredMeals}
+          currentUserId={user?.id}
+          showOnlyMyMeals={showOnlyMyMeals}
+          isAdmin={isAdmin}
+          onMealAction={showMealActions}
+          onAddMeal={handleAddMeal}
+        />
 
         {/* Load More Button (Pagination) */}
         {filteredMeals.length > 0 && (
           <Button 
             action="secondary" 
             variant="outline" 
-            style={{ marginTop: 16,  }}
+            style={{ marginTop: 16 }}
           >
             <ButtonText>Load More Entries</ButtonText>
           </Button>
