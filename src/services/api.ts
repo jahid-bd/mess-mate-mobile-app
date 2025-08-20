@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_CONFIG, STORAGE_KEYS } from '../utils/constants';
+import * as SecureStore from 'expo-secure-store';
+import { API_CONFIG } from '../utils/constants';
 import { 
   LoginRequest, 
   SignupRequest, 
@@ -20,7 +20,7 @@ class ApiClient {
   }
 
   private async getAuthToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    return await SecureStore.getItemAsync('authToken');
   }
 
   private async request<T>(
