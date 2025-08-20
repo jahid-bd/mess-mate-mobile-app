@@ -22,7 +22,8 @@ import { ProfileHeader } from '../../src/components/ProfileHeader';
 export default function ProfileScreen() {
   const { colorScheme, toggleTheme } = useTheme();
   const colors = useThemeColors();
-  const { user, logout } = useAuthStore();
+  const { user, signOut } = useAuthStore();
+
   const isDark = colorScheme === 'dark';
 
   const handleLogout = () => {
@@ -35,7 +36,7 @@ export default function ProfileScreen() {
           text: 'Logout', 
           style: 'destructive', 
           onPress: async () => {
-            await logout();
+            await signOut();
             router.replace('/(auth)/signin');
           }
         }
@@ -199,7 +200,7 @@ export default function ProfileScreen() {
       </Button>
 
       {/* App Info */}
-      <View className="items-center py-4">
+      <View className="items-center py-4 pb-10">
         <Text className="text-typography-500 text-sm">
           MessMate v1.0.0
         </Text>

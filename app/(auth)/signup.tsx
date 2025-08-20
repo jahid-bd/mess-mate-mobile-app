@@ -14,14 +14,14 @@ import { Button } from '../../components/ui/button';
 import { Input, InputField, InputSlot } from '../../components/ui/input';
 import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
-import { useAuth } from '../../src/context/AuthContext';
+import { useAuthStore } from '../../src/stores/authStore';
 import { MessMateLogo } from '../../src/components/MessMateLogo';
 import { authApi } from '../../src/services/api';
 import { debugNetworkIssue } from '../../src/utils/networkDebug';
 
 export default function SignUpScreen() {
   const colors = useThemeColors();
-  const { signIn } = useAuth();
+  const { signIn } = useAuthStore();
   const insets = useSafeAreaInsets();
   
   const [formData, setFormData] = useState({

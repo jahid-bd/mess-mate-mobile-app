@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { User } from '../types/api';
+import { userApi } from '../services/api';
 
 interface AuthState {
   user: User | null;
@@ -11,11 +12,13 @@ interface AuthState {
   token: string | null;
 
   // Actions
+  signIn: (token: string) => Promise<void>;
+  signOut: () => Promise<void>;
   setUser: (user: User) => void;
-  setToken: (token: string) => void;
-  logout: () => void;
+  setToken: (token: string) => Promise<void>;
   setLoading: (loading: boolean) => void;
   initializeAuth: () => Promise<void>;
+  updateUser: (userData: User) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -26,14 +29,36 @@ export const useAuthStore = create<AuthState>()(
       isLoading: true,
       token: null,
 
-      setUser: (user) => set({ user, isAuthenticated: true }),
-
-      setToken: async (token) => {
-        await SecureStore.setItemAsync('authToken', token);
-        set({ token });
+      signIn: async (authToken: string) => {
+        try {
+          set({ isLoading: true });
+          
+          // Store token securely
+          await SecureStore.setItemAsync('authToken', authToken);
+          set({ token: authToken });
+          
+          // Fetch user profile
+          const userData = await userApi.getProfile();
+          set({ 
+            user: userData, 
+            isAuthenticated: true,
+            isLoading: false 
+          });
+          
+        } catch (error) {
+          // Clear token if profile fetch fails
+          await SecureStore.deleteItemAsync('authToken');
+          set({ 
+            token: null, 
+            user: null, 
+            isAuthenticated: false,
+            isLoading: false 
+          });
+          throw error;
+        }
       },
 
-      logout: async () => {
+      signOut: async () => {
         await SecureStore.deleteItemAsync('authToken');
         set({
           user: null,
@@ -42,18 +67,44 @@ export const useAuthStore = create<AuthState>()(
         });
       },
 
+      setUser: (user) => set({ user, isAuthenticated: true }),
+
+      setToken: async (token) => {
+        await SecureStore.setItemAsync('authToken', token);
+        set({ token });
+      },
+
       setLoading: (loading) => set({ isLoading: loading }),
+
+      updateUser: (userData: User) => {
+        set({ user: userData });
+      },
 
       initializeAuth: async () => {
         try {
           const token = await SecureStore.getItemAsync('authToken');
           if (token) {
-            set({ token, isAuthenticated: true });
-            // You can add API call to verify token and get user data
+            set({ token, isLoading: true });
+            
+            // Validate token by fetching fresh user profile
+            try {
+              const userData = await userApi.getProfile();
+              set({ 
+                user: userData, 
+                isAuthenticated: true,
+                isLoading: false 
+              });
+            } catch (error) {
+              // Token is invalid, clear stored data
+              console.log('Token validation failed:', error);
+              await get().signOut();
+              set({ isLoading: false });
+            }
+          } else {
+            set({ isLoading: false });
           }
         } catch (error) {
           console.error('Error initializing auth:', error);
-        } finally {
           set({ isLoading: false });
         }
       },

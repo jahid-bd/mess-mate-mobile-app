@@ -17,7 +17,6 @@ function TabBarIcon({ Icon, color, focused }: { Icon: any; color: string; focuse
 }
 
 export default function TabLayout() {
-  const { colorScheme } = useTheme();
   const colors = useThemeColors();
   
   return (
@@ -28,7 +27,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.background.primary,
           borderTopWidth: 1,
-          borderTopColor: colorScheme === 'dark' ? colors.background.secondary : '#E5E5E5',
+          borderTopColor: colors.border.primary,
           paddingBottom: 8,
           paddingTop: 8,
           height: 70,
@@ -41,7 +40,7 @@ export default function TabLayout() {
         headerStyle: {
           backgroundColor: colors.background.primary,
           borderBottomWidth: 1,
-          borderBottomColor: colorScheme === 'dark' ? colors.background.secondary : '#E5E5E5',
+          borderBottomColor: colors.border.primary,
         },
         headerTintColor: colors.text.primary,
         headerTitleStyle: {
