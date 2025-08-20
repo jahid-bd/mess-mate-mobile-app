@@ -18,7 +18,7 @@ export function MealsHeader({ showFilters, onAddMeal, onToggleFilters }: MealsHe
       <Button 
         action="primary" 
         variant="solid" 
-        style={{ flex: 1, height: 40 }}
+        style={{ flex: 1, height: 38 }}
         onPress={onAddMeal}
       >
         <Plus size={20} color={colors.text.inverse} />
@@ -31,8 +31,8 @@ export function MealsHeader({ showFilters, onAddMeal, onToggleFilters }: MealsHe
         action={showFilters ? "primary" : "default"}
         variant={showFilters ? "solid" : "outline"}
         style={{ 
-          width: 42, 
-          height: 42,
+          width: 40, 
+          height: 40,
           borderColor: showFilters ? colors.primary[500] : colors.border.primary,
           backgroundColor: showFilters ? colors.primary[100] : 'transparent'
         }}
