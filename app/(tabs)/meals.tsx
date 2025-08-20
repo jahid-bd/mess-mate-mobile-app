@@ -1,4 +1,5 @@
 import { View, Text, ScrollView } from 'react-native';
+import { router } from 'expo-router';
 import { ButtonText, Button } from '../../components/ui/button';
 import { Card } from '../../components/ui/card';
 import { Input, InputField } from '../../components/ui/input';
@@ -7,6 +8,10 @@ import { useThemeColors } from '../../src/hooks/useThemeColors';
 
 export default function MealsScreen() {
   const colors = useThemeColors();
+  
+  const handleAddMeal = () => {
+    router.push('/(tabs)/add-meal');
+  };
   const mockMeals = [
     { id: 1, date: '2025-08-18', type: 'Lunch', person: 'John Doe', status: 'confirmed' },
     { id: 2, date: '2025-08-18', type: 'Dinner', person: 'Maria Smith', status: 'confirmed' },
@@ -30,7 +35,7 @@ export default function MealsScreen() {
           </Button>
         </View>
         
-        <Button action="primary" variant="solid">
+        <Button action="primary" variant="solid" onPress={handleAddMeal}>
           <Plus size={20} color={colors.icon.inverse} />
           <ButtonText className="ml-2">Add Meal Entry</ButtonText>
         </Button>

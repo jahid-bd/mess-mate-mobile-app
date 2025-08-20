@@ -7,6 +7,7 @@ import { Spinner } from '../../components/ui/spinner';
 import { Sun, Moon, TrendingUp, DollarSign as DollarSignIcon, UtensilsCrossed } from 'lucide-react-native';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
+import { HeaderWithLogo } from '../../src/components/HeaderWithLogo';
 
 export default function DashboardScreen() {
   const [isLoading] = useState(false);
@@ -23,31 +24,45 @@ export default function DashboardScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background-0 px-4 py-6">
-      {/* Header with Theme Toggle */}
-      <View className="flex-row justify-between items-center mb-6">
-        <View>
-          <Text className="text-2xl font-bold text-typography-900">
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      {/* Custom Header with Logo */}
+      <HeaderWithLogo />
+      
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24 }}>
+        {/* Welcome Section */}
+        <View style={{ marginBottom: 24 }}>
+          <Text style={{
+            fontSize: 24,
+            fontWeight: 'bold',
+            color: colors.text.primary,
+            marginBottom: 4,
+          }}>
             Welcome back! 👋
           </Text>
-          <Text className="text-typography-600 mt-1">
+          <Text style={{
+            fontSize: 16,
+            color: colors.text.secondary,
+          }}>
             {mockData.currentMonth} Overview
           </Text>
         </View>
-        <Button 
-          size="md" 
-          variant="outline" 
-          action="secondary"
-          onPress={toggleTheme}
-          className="w-12 h-12 rounded-full"
-        >
-          {isDark ? (
-            <Sun size={20} color={colors.icon.secondary} />
-          ) : (
-            <Moon size={20} color={colors.icon.secondary} />
-          )}
-        </Button>
-      </View>
+
+        {/* Theme Toggle */}
+        <View style={{ alignItems: 'flex-end', marginBottom: 24 }}>
+          <Button 
+            size="md" 
+            variant="outline" 
+            action="secondary"
+            onPress={toggleTheme}
+            className="w-12 h-12 rounded-full"
+          >
+            {isDark ? (
+              <Sun size={20} color={colors.icon.secondary} />
+            ) : (
+              <Moon size={20} color={colors.icon.secondary} />
+            )}
+          </Button>
+        </View>
 
       {/* Quick Stats Grid */}
       <View className="flex-row flex-wrap gap-4 mb-6">
@@ -181,6 +196,7 @@ export default function DashboardScreen() {
           <Text className="text-typography-600 mt-2">Loading data...</Text>
         </Card>
       )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

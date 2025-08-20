@@ -8,16 +8,19 @@ import {
   Alert 
 } from 'react-native';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { Button } from '../../components/ui/button';
 import { Input, InputField, InputSlot } from '../../components/ui/input';
 import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
+import { MessMateLogo } from '../../src/components/MessMateLogo';
 
-export default function SignUpScreen() {
+export default function SignUp() {
   const colors = useThemeColors();
   const { setUser, setToken, setLoading } = useAuthStore();
+  const insets = useSafeAreaInsets();
   
   const [formData, setFormData] = useState({
     name: '',
@@ -123,28 +126,21 @@ export default function SignUpScreen() {
           flexGrow: 1,
           justifyContent: 'center',
           padding: 24,
+          paddingTop: Math.max(24, insets.top + 24),
         }}
         keyboardShouldPersistTaps="handled"
       >
         <View style={{ alignItems: 'center', marginBottom: 40 }}>
+          <MessMateLogo size="lg" />
           <Text
             style={{
-              fontSize: 32,
-              fontWeight: 'bold',
-              color: colors.text.primary,
-              marginBottom: 8,
-            }}
-          >
-            Join MessMate! 🚀
-          </Text>
-          <Text
-            style={{
-              fontSize: 16,
+              fontSize: 18,
               color: colors.text.secondary,
               textAlign: 'center',
+              marginTop: 16,
             }}
           >
-            Create your account to start managing meals
+            Create your account to start managing meals together
           </Text>
         </View>
 

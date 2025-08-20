@@ -57,7 +57,7 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon Icon={Home} color={color} focused={focused} />
           ),
-          headerTitle: 'MessMate Dashboard',
+          headerShown: false,
         }}
       />
       <Tabs.Screen
@@ -87,7 +87,14 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <TabBarIcon Icon={User} color={color} focused={focused} />
           ),
-          headerTitle: 'Profile & Settings',
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="add-meal"
+        options={{
+          href: null, // Hide from tab bar
+          headerTitle: 'Add Meal Entry',
         }}
       />
     </Tabs>

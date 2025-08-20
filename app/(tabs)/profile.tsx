@@ -17,6 +17,7 @@ import {
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
+import { ProfileHeader } from '../../src/components/ProfileHeader';
 
 export default function ProfileScreen() {
   const { colorScheme, toggleTheme } = useTheme();
@@ -43,7 +44,11 @@ export default function ProfileScreen() {
   };
 
   return (
-    <ScrollView className="flex-1 bg-background-0 px-4 py-6">
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      {/* Custom Header with Logo */}
+      <ProfileHeader />
+      
+      <ScrollView style={{ flex: 1, paddingHorizontal: 16, paddingVertical: 24 }}>
       {/* Profile Header */}
       <Card className="p-6 mb-6">
         <View className="items-center">
@@ -202,6 +207,7 @@ export default function ProfileScreen() {
           Built with ❤️ for better mess management
         </Text>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }

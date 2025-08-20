@@ -8,15 +8,23 @@
     "scheme": "messmate",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "statusBarStyle": "auto",
+    "statusBarHidden": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "statusBarStyle": "auto",
+      "statusBarHidden": false
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "statusBar": {
+        "hidden": false,
+        "style": "auto"
+      }
     },
     "web": {
       "bundler": "metro",
