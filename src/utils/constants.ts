@@ -1,13 +1,34 @@
+import { Platform } from 'react-native';
+
 // API Configuration
+const getBaseUrl = () => {
+  // If environment variable is set, use it directly
+  if (process.env.EXPO_PUBLIC_API_BASE_URL) {
+    return process.env.EXPO_PUBLIC_API_BASE_URL;
+  }
+  
+  // Fallback to platform-specific URLs for development
+  if (!__DEV__) {
+    return 'https://messmate-api.com';
+  }
+  
+  // Development environment fallbacks
+  if (Platform.OS === 'web') {
+    return process.env.EXPO_PUBLIC_API_BASE_URL_LOCALHOST || 'http://localhost:4000';
+  }
+  
+  // For Android emulator, use 10.0.2.2 to reach host machine
+  if (Platform.OS === 'android') {
+    return process.env.EXPO_PUBLIC_API_BASE_URL_ANDROID_EMULATOR || 'http://10.0.2.2:4000';
+  }
+  
+  // For iOS simulator and physical devices, use local IP
+  return process.env.EXPO_PUBLIC_API_BASE_URL_IOS_DEVICE || 'http://192.168.0.138:4000';
+};
+
 export const API_CONFIG = {
-  // Update this to your server's IP address when testing on device
-  // For iOS Simulator: localhost
-  // For Android Emulator: 10.0.2.2
-  // For Physical Device: Your computer's IP address
-  BASE_URL: __DEV__
-    ? 'http://localhost:3000'
-    : 'https://your-production-api.com',
-  TIMEOUT: 10000,
+  BASE_URL: getBaseUrl(),
+  TIMEOUT: parseInt(process.env.EXPO_PUBLIC_API_TIMEOUT || '10000', 10),
 };
 
 // Meal Types

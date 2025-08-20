@@ -14,12 +14,14 @@ import { Button } from '../../components/ui/button';
 import { Input, InputField, InputSlot } from '../../components/ui/input';
 import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
-import { useAuthStore } from '../../src/stores/authStore';
+import { useAuth } from '../../src/context/AuthContext';
 import { MessMateLogo } from '../../src/components/MessMateLogo';
+import { authApi } from '../../src/services/api';
+import { debugNetworkIssue } from '../../src/utils/networkDebug';
 
-export default function SignUp() {
+export default function SignUpScreen() {
   const colors = useThemeColors();
-  const { setUser, setToken, setLoading } = useAuthStore();
+  const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
   
   const [formData, setFormData] = useState({
@@ -78,33 +80,40 @@ export default function SignUp() {
     if (!validateForm()) return;
     
     setIsLoading(true);
-    setLoading(true);
     
     try {
-      // Skip API call for now - just simulate successful signup
-      // Mock user data
-      const mockUser = {
-        id: 1,
-        name: formData.name,
+      // Call real API
+      const authResponse = await authApi.signUp({
         email: formData.email,
-        role: 'USER' as const,
-        status: 'ACTIVE' as const,
-        createdAt: new Date().toISOString(),
-      };
+        password: formData.password,
+        name: formData.name,
+      });
       
-      // Set mock auth data
-      await setToken('mock-jwt-token');
-      setUser(mockUser);
+      // Use AuthContext to sign in (this will fetch user profile and store data)
+      await signIn(authResponse.access_token);
       
       // Navigate to main app
       router.replace('/(tabs)');
       
     } catch (error: any) {
       console.error('Sign up error:', error);
-      Alert.alert('Sign Up Failed', 'Something went wrong. Please try again.');
+      
+      let errorMessage = 'Something went wrong. Please try again.';
+      
+      if (error.message.includes('403') || error.message.includes('already exists')) {
+        errorMessage = 'User already exists with this email';
+      } else if (error.message.includes('500')) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message.includes('timeout') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+        // Run network diagnostics for network errors
+        const networkResult = await debugNetworkIssue();
+        errorMessage = `Network error: ${networkResult.message}`;
+        console.log('Network debug result:', networkResult);
+      }
+      
+      Alert.alert('Sign Up Failed', errorMessage);
     } finally {
       setIsLoading(false);
-      setLoading(false);
     }
   };
 

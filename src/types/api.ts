@@ -50,7 +50,6 @@ export interface UserMonthlyCost {
 
 export interface AuthResponse {
   access_token: string;
-  user: User;
 }
 
 export interface LoginRequest {
@@ -61,7 +60,7 @@ export interface LoginRequest {
 export interface SignupRequest {
   email: string;
   password: string;
-  name?: string;
+  name: string;
 }
 
 export interface CreateMealEntryRequest {

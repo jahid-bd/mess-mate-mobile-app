@@ -14,12 +14,14 @@ import { Button } from '../../components/ui/button';
 import { Input, InputField, InputSlot } from '../../components/ui/input';
 import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
-import { useAuthStore } from '../../src/stores/authStore';
+import { useAuth } from '../../src/context/AuthContext';
 import { MessMateLogo } from '../../src/components/MessMateLogo';
+import { authApi } from '../../src/services/api';
+import { debugNetworkIssue } from '../../src/utils/networkDebug';
 
 export default function SignInScreen() {
   const colors = useThemeColors();
-  const { setUser, setToken, setLoading } = useAuthStore();
+  const { signIn } = useAuth();
   const insets = useSafeAreaInsets();
   
   const [formData, setFormData] = useState({
@@ -53,33 +55,39 @@ export default function SignInScreen() {
     if (!validateForm()) return;
     
     setIsLoading(true);
-    setLoading(true);
     
     try {
-      // Skip API call for now - just simulate successful login
-      // Mock user data
-      const mockUser = {
-        id: 1,
-        name: formData.email.split('@')[0] || 'User',
+      // Call real API
+      const authResponse = await authApi.signIn({
         email: formData.email,
-        role: 'USER' as const,
-        status: 'ACTIVE' as const,
-        createdAt: new Date().toISOString(),
-      };
+        password: formData.password,
+      });
       
-      // Set mock auth data
-      await setToken('mock-jwt-token');
-      setUser(mockUser);
+      // Use AuthContext to sign in (this will fetch user profile and store data)
+      await signIn(authResponse.access_token);
       
       // Navigate to main app
       router.replace('/(tabs)');
       
     } catch (error: any) {
       console.error('Sign in error:', error);
-      Alert.alert('Sign In Failed', 'Something went wrong. Please try again.');
+      
+      let errorMessage = 'Something went wrong. Please try again.';
+      
+      if (error.message.includes('401') || error.message.includes('403')) {
+        errorMessage = 'Invalid email or password';
+      } else if (error.message.includes('500')) {
+        errorMessage = 'Server error. Please try again later.';
+      } else if (error.message.includes('timeout') || error.message.includes('Network') || error.message.includes('Failed to fetch')) {
+        // Run network diagnostics for network errors
+        const networkResult = await debugNetworkIssue();
+        errorMessage = `Network error: ${networkResult.message}`;
+        console.log('Network debug result:', networkResult);
+      }
+      
+      Alert.alert('Sign In Failed', errorMessage);
     } finally {
       setIsLoading(false);
-      setLoading(false);
     }
   };
 
