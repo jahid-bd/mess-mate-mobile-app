@@ -23,6 +23,7 @@ export interface MealEntry {
 }
 
 export interface MealStats {
+  totalEntries: number;
   totalMeals: number;
   todayMeals: number;
   weeklyMeals: number;

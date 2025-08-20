@@ -112,7 +112,7 @@ export function MealEntryCard({ meal, currentUserId, canEdit, onActionPress }: M
               color: colors.text.secondary,
               marginLeft: 6 
             }}>
-              {meal.user.name}
+              {meal.user?.name || meal.user?.email || 'Unknown User'}
               {meal.userId === currentUserId && (
                 <Text style={{ color: colors.primary[600] }}> (You)</Text>
               )}

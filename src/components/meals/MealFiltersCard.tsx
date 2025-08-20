@@ -1,7 +1,7 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, Pressable } from 'react-native';
 import { Card } from '../../../components/ui/card';
-import { Button, ButtonText } from '../../../components/ui/button';
+import { Button, ButtonText, ButtonIcon } from '../../../components/ui/button';
 import { Calendar, User as UserIcon } from 'lucide-react-native';
 import { useThemeColors } from '../../hooks/useThemeColors';
 
@@ -45,7 +45,7 @@ export function MealFiltersCard({
   const getSelectedUserName = () => {
     if (!selectedUser) return 'All Users';
     const user = users.find(u => u.id === selectedUser);
-    return user ? user.name : 'All Users';
+    return user ? (user.name || user.email || 'Unknown User') : 'All Users';
   };
 
   return (
@@ -85,8 +85,8 @@ export function MealFiltersCard({
             }}
             onPress={onMonthPickerOpen}
           >
-            <Calendar size={16} color={colors.icon.muted} />
-            <ButtonText style={{ marginLeft: 8, color: colors.text.primary }}>
+            <ButtonIcon as={Calendar} size="sm" />
+            <ButtonText>
               {selectedMonth}
             </ButtonText>
           </Button>
@@ -111,8 +111,8 @@ export function MealFiltersCard({
             }}
             onPress={onUserPickerOpen}
           >
-            <UserIcon size={16} color={colors.icon.muted} />
-            <ButtonText style={{ marginLeft: 8, color: colors.text.primary }}>
+            <ButtonIcon as={UserIcon} size="sm" />
+            <ButtonText>
               {getSelectedUserName()}
             </ButtonText>
           </Button>
@@ -121,24 +121,34 @@ export function MealFiltersCard({
         {/* Toggle My Meals Only */}
         {!isAdmin && (
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <Button 
-              action={showOnlyMyMeals ? "primary" : "secondary"}
-              variant={showOnlyMyMeals ? "solid" : "outline"}
-              size="sm"
+            <Pressable 
               style={{
-                borderColor: showOnlyMyMeals ? undefined : colors.border.primary,
-                backgroundColor: showOnlyMyMeals ? undefined : 'transparent'
+                backgroundColor: showOnlyMyMeals ? colors.primary[500] : 'transparent',
+                borderWidth: 1,
+                borderColor: showOnlyMyMeals ? colors.primary[500] : colors.border.primary,
+                borderRadius: 8,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                minHeight: 36,
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 8
               }}
               onPress={onToggleMyMeals}
             >
-              <UserIcon size={16} color={showOnlyMyMeals ? colors.text.inverse : colors.icon.muted} />
-              <ButtonText style={{ 
-                marginLeft: 8,
-                color: showOnlyMyMeals ? colors.text.inverse : colors.text.primary 
+              <UserIcon 
+                size={16} 
+                color={showOnlyMyMeals ? colors.text.inverse : colors.icon.muted} 
+              />
+              <Text style={{
+                color: showOnlyMyMeals ? colors.text.inverse : colors.text.primary,
+                fontSize: 14,
+                fontWeight: '500'
               }}>
                 My Meals Only
-              </ButtonText>
-            </Button>
+              </Text>
+            </Pressable>
           </View>
         )}
 
@@ -153,48 +163,80 @@ export function MealFiltersCard({
           </Text>
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
             {['date', 'type', 'user'].map((option) => (
-              <Button
+              <Pressable
                 key={option}
-                action={sortBy === option ? "primary" : "secondary"}
-                variant={sortBy === option ? "solid" : "outline"}
-                size="sm"
+                style={{
+                  backgroundColor: sortBy === option ? colors.primary[500] : 'transparent',
+                  borderWidth: 1,
+                  borderColor: sortBy === option ? colors.primary[500] : colors.border.primary,
+                  borderRadius: 8,
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  minHeight: 36,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
                 onPress={() => onSortByChange(option as any)}
               >
-                <ButtonText style={{ 
-                  color: sortBy === option ? colors.text.inverse : colors.text.primary 
+                <Text style={{
+                  color: sortBy === option ? colors.text.inverse : colors.text.primary,
+                  fontSize: 14,
+                  fontWeight: '500'
                 }}>
                   {option.charAt(0).toUpperCase() + option.slice(1)}
-                </ButtonText>
-              </Button>
+                </Text>
+              </Pressable>
             ))}
           </View>
           
           {/* Sort Order */}
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Button
-              action={sortOrder === 'desc' ? "primary" : "secondary"}
-              variant={sortOrder === 'desc' ? "solid" : "outline"}
-              size="sm"
+            <Pressable
+              style={{
+                backgroundColor: sortOrder === 'desc' ? colors.primary[500] : 'transparent',
+                borderWidth: 1,
+                borderColor: sortOrder === 'desc' ? colors.primary[500] : colors.border.primary,
+                borderRadius: 8,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                minHeight: 36,
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1
+              }}
               onPress={() => onSortOrderChange('desc')}
             >
-              <ButtonText style={{ 
-                color: sortOrder === 'desc' ? colors.text.inverse : colors.text.primary 
+              <Text style={{
+                color: sortOrder === 'desc' ? colors.text.inverse : colors.text.primary,
+                fontSize: 14,
+                fontWeight: '500'
               }}>
                 Newest First
-              </ButtonText>
-            </Button>
-            <Button
-              action={sortOrder === 'asc' ? "primary" : "secondary"}
-              variant={sortOrder === 'asc' ? "solid" : "outline"}
-              size="sm"
+              </Text>
+            </Pressable>
+            <Pressable
+              style={{
+                backgroundColor: sortOrder === 'asc' ? colors.primary[500] : 'transparent',
+                borderWidth: 1,
+                borderColor: sortOrder === 'asc' ? colors.primary[500] : colors.border.primary,
+                borderRadius: 8,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                minHeight: 36,
+                justifyContent: 'center',
+                alignItems: 'center',
+                flex: 1
+              }}
               onPress={() => onSortOrderChange('asc')}
             >
-              <ButtonText style={{ 
-                color: sortOrder === 'asc' ? colors.text.inverse : colors.text.primary 
+              <Text style={{
+                color: sortOrder === 'asc' ? colors.text.inverse : colors.text.primary,
+                fontSize: 14,
+                fontWeight: '500'
               }}>
                 Oldest First
-              </ButtonText>
-            </Button>
+              </Text>
+            </Pressable>
           </View>
         </View>
       </View>

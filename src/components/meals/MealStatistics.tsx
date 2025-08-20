@@ -5,6 +5,7 @@ import { TrendingUp } from 'lucide-react-native';
 import { useThemeColors } from '../../hooks/useThemeColors';
 
 interface MealStats {
+  totalEntries: number;
   totalMeals: number;
   todayMeals: number;
   weeklyMeals: number;
@@ -15,10 +16,9 @@ interface MealStats {
 
 interface MealStatisticsProps {
   stats: MealStats;
-  isAdmin: boolean;
 }
 
-export function MealStatistics({ stats, isAdmin }: MealStatisticsProps) {
+export function MealStatistics({ stats }: MealStatisticsProps) {
   const colors = useThemeColors();
 
   return (
@@ -98,13 +98,27 @@ export function MealStatistics({ stats, isAdmin }: MealStatisticsProps) {
               color: colors.success[600],
               marginLeft: 4 
             }}>
-              {stats.totalMeals}
+              {stats.totalEntries}
             </Text>
           </View>
         </Card>
         
-        {!isAdmin && (
-          <Card style={{ 
+        <Card style={{ 
+          flex: 1, 
+          padding: 12,
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
+          <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
+            Total Meals
+          </Text>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary[600] }}>
+            {stats.totalMeals}
+          </Text>
+        </Card>
+        
+        <Card style={{ 
             flex: 1, 
             padding: 12,
             backgroundColor: colors.background.primary,
@@ -112,13 +126,12 @@ export function MealStatistics({ stats, isAdmin }: MealStatisticsProps) {
             borderColor: colors.border.primary
           }}>
             <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-              My Meals
+              My Month
             </Text>
             <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.warning[600] }}>
               {stats.userMeals}
             </Text>
           </Card>
-        )}
       </View>
     </View>
   );

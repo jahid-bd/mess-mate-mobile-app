@@ -3,6 +3,7 @@ import {
   MealEntry,
   CreateMealEntryRequest,
   PaginatedResponse,
+  MealStats,
 } from '../types/api';
 
 export const mealApi = {
@@ -14,8 +15,17 @@ export const mealApi = {
     userId?: number;
     sortBy?: string;
     order?: 'asc' | 'desc';
-  }): Promise<PaginatedResponse<MealEntry>> => {
+    includeStats?: boolean;
+  }): Promise<PaginatedResponse<MealEntry> & { stats?: MealStats }> => {
     const response = await api.get('/meal-entries', { params });
+    return response.data;
+  },
+
+  getMealStats: async (params?: {
+    month?: string;
+    userId?: number;
+  }): Promise<MealStats> => {
+    const response = await api.get('/meal-entries/stats', { params });
     return response.data;
   },
 

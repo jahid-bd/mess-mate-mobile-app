@@ -6,7 +6,9 @@ import {
   AuthResponse, 
   User,
   MealEntry,
-  CreateMealEntryRequest
+  CreateMealEntryRequest,
+  PaginatedResponse,
+  MealStats
 } from '../types/api';
 
 // API Client Configuration
@@ -141,8 +143,45 @@ export const userApi = {
 
 // Meal Entries API
 export const mealEntriesApi = {
-  getAll: (): Promise<MealEntry[]> => 
-    apiClient.get<MealEntry[]>('/meal-entries'),
+  getAll: (params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    month?: string;
+    userId?: number;
+    sortBy?: string;
+    order?: 'asc' | 'desc';
+    includeStats?: boolean;
+  }): Promise<PaginatedResponse<MealEntry> & { stats?: MealStats }> => {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.limit) searchParams.append('limit', params.limit.toString());
+    if (params?.search) searchParams.append('search', params.search);
+    if (params?.month) searchParams.append('month', params.month);
+    if (params?.userId) searchParams.append('userId', params.userId.toString());
+    if (params?.sortBy) searchParams.append('sortBy', params.sortBy);
+    if (params?.order) searchParams.append('order', params.order);
+    if (params?.includeStats) searchParams.append('includeStats', 'true');
+    
+    const queryString = searchParams.toString();
+    return apiClient.get<PaginatedResponse<MealEntry> & { stats?: MealStats }>(
+      `/meal-entries${queryString ? `?${queryString}` : ''}`
+    );
+  },
+
+  getStats: (params?: {
+    month?: string;
+    userId?: number;
+  }): Promise<MealStats> => {
+    const searchParams = new URLSearchParams();
+    if (params?.month) searchParams.append('month', params.month);
+    if (params?.userId) searchParams.append('userId', params.userId.toString());
+    
+    const queryString = searchParams.toString();
+    return apiClient.get<MealStats>(
+      `/meal-entries/stats${queryString ? `?${queryString}` : ''}`
+    );
+  },
   
   create: (mealData: CreateMealEntryRequest): Promise<MealEntry> => 
     apiClient.post<MealEntry>('/meal-entries', mealData),

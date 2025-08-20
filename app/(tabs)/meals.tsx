@@ -4,16 +4,16 @@ import { router } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
+import { useMealsQuery, useMealStatsQuery } from '../../src/hooks/useMealsQuery';
 import { MonthPicker } from '../../src/components/MonthPicker';
 import { UserPicker } from '../../src/components/UserPicker';
+import { MealEntry, User } from '../../src/types/api';
 import {
   MealStatistics,
   MealFiltersCard,
   MealsList,
   MealsHeader,
-  type MealEntry,
   type MealStats,
-  type User,
 } from '../../src/components/meals';
 
 export default function MealsScreen() {
@@ -32,67 +32,91 @@ export default function MealsScreen() {
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showUserPicker, setShowUserPicker] = useState(false);
 
-  // Mock data - this will be replaced with API calls
-  const mockStats: MealStats = {
-    totalMeals: 145,
-    todayMeals: 12,
-    weeklyMeals: 84,
-    monthlyMeals: 145,
-    averagePerDay: 4.8,
-    userMeals: 23,
+  // React Query for meals data with comprehensive filtering and stats
+  const { 
+    data: mealsResponse, 
+    isLoading, 
+    isError, 
+    error, 
+    refetch 
+  } = useMealsQuery({
+    month: selectedMonth,
+    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
+    sortBy,
+    order: sortOrder,
+    limit: 50,
+    includeStats: true, // Request stats with the meals data
+  });
+
+  // Get stats from API response or use separate stats query as fallback
+  const { 
+    data: separateStats,
+    isLoading: statsLoading 
+  } = useMealStatsQuery({
+    month: selectedMonth,
+    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
+  });
+
+  console.log("Query params:", {
+    month: selectedMonth,
+    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
+    sortBy,
+    order: sortOrder,
+    limit: 50,
+  });
+  console.log("Meals data:", mealsResponse);
+  console.log("Stats data:", mealsResponse?.stats || separateStats);
+
+  // Extract meals from response
+  const meals = mealsResponse?.data || [];
+
+  // Use stats from API response, fallback to separate stats query, or empty stats
+  const apiStats = mealsResponse?.stats || separateStats;
+  const stats: MealStats = apiStats ? {
+    ...apiStats,
+    userMeals: apiStats.userMeals || 0, // Convert null to 0
+  } : {
+    totalEntries: 0,
+    totalMeals: 0,
+    todayMeals: 0,
+    weeklyMeals: 0,
+    monthlyMeals: 0,
+    averagePerDay: 0,
+    userMeals: 0,
   };
 
   const mockUsers: User[] = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Maria Smith', email: 'maria@example.com' },
-    { id: 3, name: 'Ahmed Khan', email: 'ahmed@example.com' },
-    { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' },
-  ];
-
-  const mockMeals: MealEntry[] = [
-    {
-      id: 1,
-      date: '2025-08-20',
-      amount: 1,
-      type: 'LUNCH',
-      note: 'Regular meal',
-      userId: 1,
-      user: { id: 1, name: 'John Doe', email: 'john@example.com' },
-      createdAt: '2025-08-20T12:30:00Z',
-      updatedAt: '2025-08-20T12:30:00Z',
+    { 
+      id: 1, 
+      name: 'John Doe', 
+      email: 'john@example.com',
+      role: 'USER',
+      status: 'ACTIVE',
+      createdAt: '2025-01-01'
     },
-    {
-      id: 2,
-      date: '2025-08-20',
-      amount: 1,
-      type: 'DINNER',
-      note: 'Late dinner',
-      userId: 2,
-      user: { id: 2, name: 'Maria Smith', email: 'maria@example.com' },
-      createdAt: '2025-08-20T20:30:00Z',
-      updatedAt: '2025-08-20T20:30:00Z',
+    { 
+      id: 2, 
+      name: 'Maria Smith', 
+      email: 'maria@example.com',
+      role: 'USER',
+      status: 'ACTIVE',
+      createdAt: '2025-01-01'
     },
-    {
-      id: 3,
-      date: '2025-08-19',
-      amount: 1,
-      type: 'BREAKFAST',
-      note: undefined,
-      userId: 1,
-      user: { id: 1, name: 'John Doe', email: 'john@example.com' },
-      createdAt: '2025-08-19T08:00:00Z',
-      updatedAt: '2025-08-19T08:00:00Z',
+    { 
+      id: 3, 
+      name: 'Ahmed Khan', 
+      email: 'ahmed@example.com',
+      role: 'USER',
+      status: 'ACTIVE',
+      createdAt: '2025-01-01'
     },
-    {
-      id: 4,
-      date: '2025-08-19',
-      amount: 1,
-      type: 'SHAHUR',
-      note: 'Ramadan sehri',
-      userId: 3,
-      user: { id: 3, name: 'Ahmed Khan', email: 'ahmed@example.com' },
-      createdAt: '2025-08-19T04:30:00Z',
-      updatedAt: '2025-08-19T04:30:00Z',
+    { 
+      id: 4, 
+      name: 'Sarah Wilson', 
+      email: 'sarah@example.com',
+      role: 'USER',
+      status: 'ACTIVE',
+      createdAt: '2025-01-01'
     },
   ];
 
@@ -154,29 +178,51 @@ export default function MealsScreen() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    // Simulate API call
-    setTimeout(() => setIsRefreshing(false), 1000);
+    await refetch();
+    setIsRefreshing(false);
   };
 
-  // Data processing
-  const filteredMeals = mockMeals
-    .filter(meal => !showOnlyMyMeals || meal.userId === user?.id)
-    .filter(meal => !selectedUser || meal.userId === selectedUser)
-    .sort((a, b) => {
-      let comparison = 0;
-      switch (sortBy) {
-        case 'date':
-          comparison = new Date(a.date).getTime() - new Date(b.date).getTime();
-          break;
-        case 'type':
-          comparison = a.type.localeCompare(b.type);
-          break;
-        case 'user':
-          comparison = a.user.name.localeCompare(b.user.name);
-          break;
-      }
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+  // Filter change handlers that trigger new API calls
+  const handleMonthChange = (month: string) => {
+    setSelectedMonth(month);
+    // React Query will automatically refetch due to dependency change
+  };
+
+  const handleUserFilterChange = (userId: number | null) => {
+    setSelectedUser(userId);
+    // React Query will automatically refetch due to dependency change
+  };
+
+  const handleToggleMyMeals = () => {
+    setShowOnlyMyMeals(!showOnlyMyMeals);
+    setSelectedUser(null); // Clear user filter when toggling my meals
+    // React Query will automatically refetch due to dependency change
+  };
+
+  const handleSortChange = (newSortBy: 'date' | 'type' | 'user') => {
+    setSortBy(newSortBy);
+    // React Query will automatically refetch due to dependency change
+  };
+
+  const handleSortOrderChange = (newOrder: 'asc' | 'desc') => {
+    setSortOrder(newOrder);
+    // React Query will automatically refetch due to dependency change
+  };
+
+  const handleClearFilters = () => {
+    setSelectedUser(null);
+    setShowOnlyMyMeals(false);
+    setSortBy('date');
+    setSortOrder('desc');
+    // Month is not cleared as it's usually the primary filter
+  };
+
+  // Check if any filters are active (excluding month and default sort)
+  const hasActiveFilters = selectedUser !== null || showOnlyMyMeals || 
+    sortBy !== 'date' || sortOrder !== 'desc';
+
+  // Since we're using server-side filtering and sorting, we can use meals directly
+  const filteredMeals = meals;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
@@ -200,9 +246,46 @@ export default function MealsScreen() {
 
         {/* Meal Statistics */}
         <MealStatistics
-          stats={mockStats}
-          isAdmin={isAdmin}
+          stats={stats}
         />
+
+        {/* Active Filters Indicator */}
+        {hasActiveFilters && (
+          <View style={{ 
+            flexDirection: 'row', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            backgroundColor: colors.primary[50],
+            padding: 12,
+            borderRadius: 8,
+            marginBottom: 16,
+            borderWidth: 1,
+            borderColor: colors.primary[200]
+          }}>
+            <View style={{ flex: 1 }}>
+              <ButtonText style={{ 
+                fontSize: 14, 
+                color: colors.primary[700],
+                fontWeight: '500'
+              }}>
+                Filters Active: {[
+                  selectedUser && 'User',
+                  showOnlyMyMeals && 'My Meals',
+                  sortBy !== 'date' && `Sort: ${sortBy}`,
+                  sortOrder !== 'desc' && 'Ascending'
+                ].filter(Boolean).join(', ')}
+              </ButtonText>
+            </View>
+            <Button 
+              action="primary" 
+              variant="outline" 
+              size="sm"
+              onPress={handleClearFilters}
+            >
+              <ButtonText>Clear</ButtonText>
+            </Button>
+          </View>
+        )}
 
         {/* Filters */}
         {showFilters && (
@@ -213,24 +296,56 @@ export default function MealsScreen() {
             sortBy={sortBy}
             sortOrder={sortOrder}
             isAdmin={isAdmin}
-            users={mockUsers}
+            users={mockUsers.map(u => ({ 
+              id: u.id, 
+              name: u.name || u.email.split('@')[0], 
+              email: u.email 
+            }))}
             onMonthPickerOpen={() => setShowMonthPicker(true)}
             onUserPickerOpen={() => setShowUserPicker(true)}
-            onToggleMyMeals={() => setShowOnlyMyMeals(!showOnlyMyMeals)}
-            onSortByChange={setSortBy}
-            onSortOrderChange={setSortOrder}
+            onToggleMyMeals={handleToggleMyMeals}
+            onSortByChange={handleSortChange}
+            onSortOrderChange={handleSortOrderChange}
           />
         )}
 
-        {/* Meal Entries List */}
-        <MealsList
-          meals={filteredMeals}
-          currentUserId={user?.id}
-          showOnlyMyMeals={showOnlyMyMeals}
-          isAdmin={isAdmin}
-          onMealAction={showMealActions}
-          onAddMeal={handleAddMeal}
-        />
+        {/* Loading State */}
+        {(isLoading || (!mealsResponse?.stats && statsLoading)) && (
+          <View style={{ padding: 20, alignItems: 'center' }}>
+            <Button action="secondary" variant="outline" disabled>
+              <ButtonText>Loading meals...</ButtonText>
+            </Button>
+          </View>
+        )}
+
+        {/* Error State */}
+        {isError && (
+          <View style={{ padding: 20, alignItems: 'center' }}>
+            <Button action="negative" variant="outline" disabled>
+              <ButtonText>Error: {error?.message || 'Failed to load meals'}</ButtonText>
+            </Button>
+            <Button 
+              action="primary" 
+              variant="solid" 
+              style={{ marginTop: 8 }}
+              onPress={() => refetch()}
+            >
+              <ButtonText>Retry</ButtonText>
+            </Button>
+          </View>
+        )}
+
+        {/* Meal Entries List - only show when not loading and no error */}
+        {!isLoading && !isError && (
+          <MealsList
+            meals={filteredMeals as any} // Temporary type assertion to fix type conflict
+            currentUserId={user?.id}
+            showOnlyMyMeals={showOnlyMyMeals}
+            isAdmin={isAdmin}
+            onMealAction={showMealActions as any} // Temporary type assertion
+            onAddMeal={handleAddMeal}
+          />
+        )}
 
         {/* Load More Button (Pagination) */}
         {filteredMeals.length > 0 && (
@@ -248,16 +363,20 @@ export default function MealsScreen() {
       <MonthPicker
         visible={showMonthPicker}
         selectedMonth={selectedMonth}
-        onSelect={setSelectedMonth}
+        onSelect={handleMonthChange}
         onClose={() => setShowMonthPicker(false)}
       />
 
       {/* User Picker Modal */}
       <UserPicker
         visible={showUserPicker}
-        users={mockUsers}
+        users={mockUsers.map(u => ({ 
+          id: u.id, 
+          name: u.name || u.email.split('@')[0], 
+          email: u.email 
+        }))}
         selectedUserId={selectedUser}
-        onSelect={setSelectedUser}
+        onSelect={handleUserFilterChange}
         onClose={() => setShowUserPicker(false)}
       />
     </View>

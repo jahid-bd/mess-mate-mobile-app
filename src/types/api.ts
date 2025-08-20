@@ -86,3 +86,13 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+export interface MealStats {
+  totalEntries: number;
+  totalMeals: number;
+  todayMeals: number;
+  weeklyMeals: number;
+  monthlyMeals: number;
+  averagePerDay: number;
+  userMeals: number | null;
+}
