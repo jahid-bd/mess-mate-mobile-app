@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
-import { View, ScrollView, RefreshControl, Alert, ActionSheetIOS, Platform } from 'react-native';
+import { View, ScrollView, RefreshControl, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
 import { useMealsQuery, useMealStatsQuery } from '../../src/hooks/useMealsQuery';
+import { useDeleteMealMutation } from '../../src/hooks/useMealMutations';
 import { MonthPicker } from '../../src/components/MonthPicker';
 import { UserPicker } from '../../src/components/UserPicker';
+import { MealActionModal } from '../../src/components/MealActionModal';
+import { Toast } from '../../src/components/Toast';
 import { MealEntry, User } from '../../src/types/api';
 import {
   MealStatistics,
@@ -15,7 +18,6 @@ import {
   MealsHeader,
   type MealStats,
 } from '../../src/components/meals';
-import { Header } from '@react-navigation/elements';
 import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
 
 export default function MealsScreen() {
@@ -33,6 +35,28 @@ export default function MealsScreen() {
   const [showFilters, setShowFilters] = useState(false);
   const [showMonthPicker, setShowMonthPicker] = useState(false);
   const [showUserPicker, setShowUserPicker] = useState(false);
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [selectedMeal, setSelectedMeal] = useState<MealEntry | null>(null);
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({
+    visible: false,
+    message: '',
+    type: 'info',
+  });
+
+  // Mutation hooks
+  const deleteMealMutation = useDeleteMealMutation();
+
+  const showToast = (message: string, type: 'success' | 'error' | 'warning' | 'info' = 'info') => {
+    setToast({
+      visible: true,
+      message,
+      type,
+    });
+  };
 
   // React Query for meals data with comprehensive filtering and stats
   const { 
@@ -120,7 +144,7 @@ export default function MealsScreen() {
   };
 
   const handleEditMeal = (meal: MealEntry) => {
-    router.push(`/(tabs)/add-meal?id=${meal.id}&mode=edit`);
+    router.push(`/(tabs)/add-meal?id=${meal.id}&mode=edit&type=${meal.type}&amount=${meal.amount}&note=${encodeURIComponent(meal.note || '')}&date=${meal.date}&userId=${meal.userId}`);
   };
 
   const handleDeleteMeal = (meal: MealEntry) => {
@@ -132,9 +156,17 @@ export default function MealsScreen() {
         { 
           text: 'Delete', 
           style: 'destructive',
-          onPress: () => {
-            console.log('Delete meal:', meal.id);
-            // TODO: Call delete API
+          onPress: async () => {
+            try {
+              await deleteMealMutation.mutateAsync(meal.id);
+              showToast('Meal entry deleted successfully!', 'success');
+            } catch (error: any) {
+              console.error('Error deleting meal:', error);
+              showToast(
+                error.response?.data?.message || 'Failed to delete meal entry. Please try again.',
+                'error'
+              );
+            }
           }
         }
       ]
@@ -142,32 +174,8 @@ export default function MealsScreen() {
   };
 
   const showMealActions = (meal: MealEntry) => {
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ['Cancel', 'Edit', 'Delete'],
-          destructiveButtonIndex: 2,
-          cancelButtonIndex: 0,
-        },
-        (buttonIndex) => {
-          if (buttonIndex === 1) {
-            handleEditMeal(meal);
-          } else if (buttonIndex === 2) {
-            handleDeleteMeal(meal);
-          }
-        }
-      );
-    } else {
-      Alert.alert(
-        'Meal Actions',
-        'What would you like to do?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Edit', onPress: () => handleEditMeal(meal) },
-          { text: 'Delete', style: 'destructive', onPress: () => handleDeleteMeal(meal) }
-        ]
-      );
-    }
+    setSelectedMeal(meal);
+    setShowActionModal(true);
   };
 
   const handleRefresh = async () => {
@@ -374,6 +382,26 @@ export default function MealsScreen() {
         selectedUserId={selectedUser}
         onSelect={handleUserFilterChange}
         onClose={() => setShowUserPicker(false)}
+      />
+
+      {/* Meal Action Modal */}
+      <MealActionModal
+        visible={showActionModal}
+        meal={selectedMeal}
+        onClose={() => {
+          setShowActionModal(false);
+          setSelectedMeal(null);
+        }}
+        onEdit={handleEditMeal}
+        onDelete={handleDeleteMeal}
+      />
+
+      {/* Toast */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onHide={() => setToast(prev => ({ ...prev, visible: false }))}
       />
     </View>
   );
