@@ -129,7 +129,7 @@ export default function SignUpScreen() {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: colors.background.primary,
+          backgroundColor: colors.background.secondary,
         }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -153,7 +153,12 @@ export default function SignUpScreen() {
           </Text>
         </View>
 
-        <Card style={{ padding: 24 }}>
+        <Card style={{ 
+          padding: 24,
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
           <View style={{ gap: 20 }}>
             <View>
               <Input
@@ -161,6 +166,7 @@ export default function SignUpScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.name ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -170,6 +176,8 @@ export default function SignUpScreen() {
                   autoCapitalize="words"
                   autoComplete="name"
                   textContentType="name"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
               </Input>
               {errors.name && (
@@ -185,6 +193,7 @@ export default function SignUpScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.email ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -195,6 +204,8 @@ export default function SignUpScreen() {
                   autoCapitalize="none"
                   autoComplete="email"
                   textContentType="emailAddress"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
               </Input>
               {errors.email && (
@@ -210,6 +221,7 @@ export default function SignUpScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.password ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -219,6 +231,8 @@ export default function SignUpScreen() {
                   secureTextEntry={!showPassword}
                   autoComplete="new-password"
                   textContentType="newPassword"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
                 <InputSlot style={{ paddingRight: 8 }}>
                   <Button
@@ -252,6 +266,7 @@ export default function SignUpScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.confirmPassword ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -261,6 +276,8 @@ export default function SignUpScreen() {
                   secureTextEntry={!showConfirmPassword}
                   autoComplete="new-password"
                   textContentType="newPassword"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
                 <InputSlot style={{ paddingRight: 8 }}>
                   <Button

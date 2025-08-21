@@ -18,6 +18,8 @@ function TabBarIcon({ Icon, color, focused }: { Icon: any; color: string; focuse
 
 export default function TabLayout() {
   const colors = useThemeColors();
+  const { colorScheme } = useTheme();
+  const isDark = colorScheme === 'dark';
   
   return (
     <Tabs
@@ -26,11 +28,16 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.icon.muted,
         tabBarStyle: {
           backgroundColor: colors.background.primary,
-          borderTopWidth: 1,
-          borderTopColor: colors.border.primary,
+          borderTopWidth: isDark ? 0 : 1,
+          borderTopColor: isDark ? 'transparent' : colors.border.primary,
           paddingBottom: 8,
           paddingTop: 8,
           height: 70,
+          elevation: isDark ? 0 : 4,
+          shadowOpacity: isDark ? 0 : 0.05,
+          shadowRadius: isDark ? 0 : 4,
+          shadowOffset: isDark ? { width: 0, height: 0 } : { width: 0, height: -2 },
+          shadowColor: '#000',
         },
         tabBarLabelStyle: {
           fontSize: 12,

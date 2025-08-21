@@ -103,7 +103,7 @@ export default function SignInScreen() {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: colors.background.primary,
+          backgroundColor: colors.background.secondary,
         }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -127,7 +127,12 @@ export default function SignInScreen() {
           </Text>
         </View>
 
-        <Card style={{ padding: 24 }}>
+        <Card style={{ 
+          padding: 24,
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
           <View style={{ gap: 20 }}>
             <View>
               <Input
@@ -135,6 +140,7 @@ export default function SignInScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.email ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -145,6 +151,8 @@ export default function SignInScreen() {
                   autoCapitalize="none"
                   autoComplete="email"
                   textContentType="emailAddress"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
               </Input>
               {errors.email && (
@@ -160,6 +168,7 @@ export default function SignInScreen() {
                 size="lg"
                 style={{
                   borderColor: errors.password ? colors.icon.danger : colors.border.primary,
+                  backgroundColor: colors.background.primary
                 }}
               >
                 <InputField
@@ -169,6 +178,8 @@ export default function SignInScreen() {
                   secureTextEntry={!showPassword}
                   autoComplete="password"
                   textContentType="password"
+                  style={{ color: colors.text.primary }}
+                  placeholderTextColor={colors.text.secondary}
                 />
                 <InputSlot style={{ paddingRight: 8 }}>
                   <Button

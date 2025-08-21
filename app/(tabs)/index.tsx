@@ -24,7 +24,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.secondary }}>
       {/* Custom Header with Logo */}
       <HeaderWithLogo />
       
@@ -65,135 +65,205 @@ export default function DashboardScreen() {
         </View>
 
       {/* Quick Stats Grid */}
-      <View className="flex-row flex-wrap gap-4 mb-6">
-        <Card className="flex-1 min-w-[160px] p-4">
-          <View className="flex-row items-center mb-2">
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
+        <Card style={{ 
+          flex: 1, 
+          minWidth: 160, 
+          padding: 16,
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
             <UtensilsCrossed size={20} color={colors.icon.primary} />
-            <Text className="text-typography-600 ml-2 text-sm">Total Meals</Text>
+            <Text style={{ color: colors.text.secondary, marginLeft: 8, fontSize: 14 }}>
+              Total Meals
+            </Text>
           </View>
-          <Text className="text-2xl font-bold text-typography-900">
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.text.primary }}>
             {mockData.totalMeals}
           </Text>
-          <Text className="text-success-600 text-xs mt-1">
+          <Text style={{ color: colors.success[600], fontSize: 12, marginTop: 4 }}>
             +12% from last month
           </Text>
         </Card>
 
-        <Card className="flex-1 min-w-[160px] p-4">
-          <View className="flex-row items-center mb-2">
+        <Card style={{ 
+          flex: 1, 
+          minWidth: 160, 
+          padding: 16,
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
             <DollarSignIcon size={20} color={colors.icon.secondary} />
-            <Text className="text-typography-600 ml-2 text-sm">Total Cost</Text>
+            <Text style={{ color: colors.text.secondary, marginLeft: 8, fontSize: 14 }}>
+              Total Cost
+            </Text>
           </View>
-          <Text className="text-2xl font-bold text-typography-900">
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.text.primary }}>
             ৳{mockData.totalExpenses}
           </Text>
-          <Text className="text-error-600 text-xs mt-1">
+          <Text style={{ color: colors.error[600], fontSize: 12, marginTop: 4 }}>
             +5% from last month
           </Text>
         </Card>
       </View>
 
       {/* Monthly Summary Card */}
-      <Card className="p-6 mb-6">
-        <Text className="text-xl font-bold text-typography-900 mb-4">
+      <Card style={{ 
+        padding: 24, 
+        marginBottom: 24,
+        backgroundColor: colors.background.primary,
+        borderWidth: 1,
+        borderColor: colors.border.primary
+      }}>
+        <Text style={{ 
+          fontSize: 20, 
+          fontWeight: 'bold', 
+          color: colors.text.primary, 
+          marginBottom: 16 
+        }}>
           Monthly Summary
         </Text>
         
-        <View className="space-y-3">
-          <View className="flex-row justify-between items-center">
-            <Text className="text-typography-700">Per Person Cost</Text>
-            <Text className="text-lg font-semibold text-primary-600">
+        <View style={{ gap: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ color: colors.text.secondary }}>Per Person Cost</Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '600', 
+              color: colors.primary[600] 
+            }}>
               ৳{mockData.perPersonCost}
             </Text>
           </View>
           
-          <View className="flex-row justify-between items-center">
-            <Text className="text-typography-700">Remaining Budget</Text>
-            <Text className="text-lg font-semibold text-success-600">
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ color: colors.text.secondary }}>Remaining Budget</Text>
+            <Text style={{ 
+              fontSize: 18, 
+              fontWeight: '600', 
+              color: colors.success[600] 
+            }}>
               ৳{mockData.remainingBudget}
             </Text>
           </View>
           
-          <View className="border-t border-outline-200 pt-3 mt-3">
+          <View style={{ 
+            borderTopWidth: 1, 
+            borderTopColor: colors.border.primary, 
+            paddingTop: 12, 
+            marginTop: 12 
+          }}>
             <Button action="primary" variant="solid">
-              <ButtonText>View Detailed Report</ButtonText>
+              <ButtonText style={{ color: colors.text.inverse }}>View Detailed Report</ButtonText>
             </Button>
           </View>
         </View>
       </Card>
 
       {/* Recent Activity */}
-      <Card className="p-6 mb-6">
-        <Text className="text-xl font-bold text-typography-900 mb-4">
+      <Card style={{ 
+        padding: 24, 
+        marginBottom: 24,
+        backgroundColor: colors.background.primary,
+        borderWidth: 1,
+        borderColor: colors.border.primary
+      }}>
+        <Text style={{ 
+          fontSize: 20, 
+          fontWeight: 'bold', 
+          color: colors.text.primary, 
+          marginBottom: 16 
+        }}>
           Recent Activity
         </Text>
         
-        <View className="space-y-4">
-          <View className="flex-row items-center">
-            <Avatar className="bg-primary-500 mr-3">
-              <AvatarFallbackText>JD</AvatarFallbackText>
+        <View style={{ gap: 16 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Avatar style={{ backgroundColor: colors.primary[500], marginRight: 12 }}>
+              <AvatarFallbackText style={{ color: colors.text.inverse }}>JD</AvatarFallbackText>
             </Avatar>
-            <View className="flex-1">
-              <Text className="text-typography-900 font-medium">
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: colors.text.primary, fontWeight: '500' }}>
                 John added lunch entry
               </Text>
-              <Text className="text-typography-600 text-sm">2 hours ago</Text>
+              <Text style={{ color: colors.text.secondary, fontSize: 14 }}>2 hours ago</Text>
             </View>
           </View>
           
-          <View className="flex-row items-center">
-            <Avatar className="bg-secondary-500 mr-3">
-              <AvatarFallbackText>MS</AvatarFallbackText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Avatar style={{ backgroundColor: colors.secondary[500], marginRight: 12 }}>
+              <AvatarFallbackText style={{ color: colors.text.inverse }}>MS</AvatarFallbackText>
             </Avatar>
-            <View className="flex-1">
-              <Text className="text-typography-900 font-medium">
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: colors.text.primary, fontWeight: '500' }}>
                 Maria added grocery expense
               </Text>
-              <Text className="text-typography-600 text-sm">5 hours ago</Text>
+              <Text style={{ color: colors.text.secondary, fontSize: 14 }}>5 hours ago</Text>
             </View>
           </View>
           
-          <View className="flex-row items-center">
-            <Avatar className="bg-tertiary-500 mr-3">
-              <AvatarFallbackText>AK</AvatarFallbackText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Avatar style={{ backgroundColor: colors.tertiary[500], marginRight: 12 }}>
+              <AvatarFallbackText style={{ color: colors.text.inverse }}>AK</AvatarFallbackText>
             </Avatar>
-            <View className="flex-1">
-              <Text className="text-typography-900 font-medium">
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: colors.text.primary, fontWeight: '500' }}>
                 Ahmed completed monthly calculation
               </Text>
-              <Text className="text-typography-600 text-sm">1 day ago</Text>
+              <Text style={{ color: colors.text.secondary, fontSize: 14 }}>1 day ago</Text>
             </View>
           </View>
         </View>
       </Card>
 
       {/* Quick Actions */}
-      <Card className="p-6 mb-6">
-        <Text className="text-xl font-bold text-typography-900 mb-4">
+      <Card style={{ 
+        padding: 24, 
+        marginBottom: 24,
+        backgroundColor: colors.background.primary,
+        borderWidth: 1,
+        borderColor: colors.border.primary
+      }}>
+        <Text style={{ 
+          fontSize: 20, 
+          fontWeight: 'bold', 
+          color: colors.text.primary, 
+          marginBottom: 16 
+        }}>
           Quick Actions
         </Text>
         
-        <View className="space-y-3">
+        <View style={{ gap: 12 }}>
           <Button action="primary" variant="solid">
-            <ButtonText>Add Meal Entry</ButtonText>
+            <ButtonText style={{ color: colors.text.inverse }}>Add Meal Entry</ButtonText>
           </Button>
           
           <Button action="secondary" variant="outline">
-            <ButtonText>Add Expense</ButtonText>
+            <ButtonText style={{ color: colors.text.secondary }}>Add Expense</ButtonText>
           </Button>
           
           <Button action="positive" variant="link">
             <TrendingUp size={16} color={colors.icon.secondary} />
-            <ButtonText className="ml-2">View Analytics</ButtonText>
+            <ButtonText style={{ marginLeft: 8, color: colors.text.secondary }}>View Analytics</ButtonText>
           </Button>
         </View>
       </Card>
 
       {/* Loading Demo */}
       {isLoading && (
-        <Card className="p-6 items-center">
+        <Card style={{ 
+          padding: 24, 
+          alignItems: 'center',
+          backgroundColor: colors.background.primary,
+          borderWidth: 1,
+          borderColor: colors.border.primary
+        }}>
           <Spinner color="$primary500" size="large" />
-          <Text className="text-typography-600 mt-2">Loading data...</Text>
+          <Text style={{ color: colors.text.secondary, marginTop: 8 }}>Loading data...</Text>
         </Card>
       )}
       </ScrollView>
