@@ -24,7 +24,7 @@ export default function DashboardScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background.secondary }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
       {/* Custom Header with Logo */}
       <HeaderWithLogo />
       

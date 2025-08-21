@@ -56,3 +56,9 @@ export const STORAGE_KEYS = {
   AUTH_TOKEN: 'authToken',
   USER_DATA: 'userData',
 } as const;
+
+// Development Configuration
+export const DEV_CONFIG = {
+  SKIP_TOKEN_VALIDATION: __DEV__, // Skip token validation during development hot reloads
+  AUTH_RETRY_DELAY: 1000, // Delay before retrying auth operations
+};

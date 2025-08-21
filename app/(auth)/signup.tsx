@@ -129,7 +129,7 @@ export default function SignUpScreen() {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: colors.background.secondary,
+          backgroundColor: colors.background.primary,
         }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -153,12 +153,7 @@ export default function SignUpScreen() {
           </Text>
         </View>
 
-        <Card style={{ 
-          padding: 24,
-          backgroundColor: colors.background.primary,
-          borderWidth: 1,
-          borderColor: colors.border.primary
-        }}>
+        <View>
           <View style={{ gap: 20 }}>
             <View>
               <Input
@@ -318,7 +313,7 @@ export default function SignUpScreen() {
               </Text>
             </Button>
           </View>
-        </Card>
+        </View>
 
         <View style={{ 
           flexDirection: 'row', 

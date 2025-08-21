@@ -146,7 +146,7 @@ export default function ExpensesScreen() {
   });
 
   const ListHeaderComponent = () => (
-    <View style={{ backgroundColor: colors.background.secondary }}>
+    <View style={{ backgroundColor: colors.background.primary  }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
         <ExpenseStatistics stats={stats} />
         <ExpensesHeader 
@@ -167,7 +167,7 @@ export default function ExpensesScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background.secondary }}>
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
       <HeaderWithLogo title='Expenses' />
       <ExpensesList
         expenses={filteredExpenses}

@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SecureStore from 'expo-secure-store';
 import { User } from '../types/api';
 import { userApi } from '../services/api';
+import { DEV_CONFIG } from '../utils/constants';
 
 interface AuthState {
   user: User | null;
@@ -86,19 +87,45 @@ export const useAuthStore = create<AuthState>()(
           if (token) {
             set({ token, isLoading: true });
             
-            // Validate token by fetching fresh user profile
-            try {
-              const userData = await userApi.getProfile();
+            // Check if we have persisted user data first
+            const currentState = get();
+            if (currentState.user && currentState.isAuthenticated) {
+              // We have persisted user data, use it immediately
               set({ 
-                user: userData, 
+                user: currentState.user,
                 isAuthenticated: true,
                 isLoading: false 
               });
-            } catch (error) {
-              // Token is invalid, clear stored data
-              console.log('Token validation failed:', error);
-              await get().signOut();
-              set({ isLoading: false });
+              
+              // Validate token in background (don't await)
+              userApi.getProfile()
+                .then((userData) => {
+                  set({ user: userData });
+                })
+                .catch((error: any) => {
+                  console.log('Background token validation failed:', error);
+                  // Only sign out if it's a real auth error (401), not network issues
+                  if (error.response?.status === 401) {
+                    get().signOut();
+                  }
+                });
+            } else {
+              // No persisted user data, validate token
+              try {
+                const userData = await userApi.getProfile();
+                set({ 
+                  user: userData, 
+                  isAuthenticated: true,
+                  isLoading: false 
+                });
+              } catch (error: any) {
+                console.log('Token validation failed:', error);
+                // Only sign out if it's a real auth error (401), not network issues
+                if (error.response?.status === 401) {
+                  await get().signOut();
+                }
+                set({ isLoading: false });
+              }
             }
           } else {
             set({ isLoading: false });
@@ -115,6 +142,7 @@ export const useAuthStore = create<AuthState>()(
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
+        token: state.token, // Also persist token
       }),
     },
   ),

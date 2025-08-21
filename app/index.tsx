@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { router } from 'expo-router';
 import { Spinner } from '../components/ui/spinner';
@@ -8,20 +8,27 @@ import { useThemeColors } from '../src/hooks/useThemeColors';
 export default function Index() {
   const { isAuthenticated, isLoading, initializeAuth } = useAuthStore();
   const colors = useThemeColors();
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   useEffect(() => {
-    initializeAuth();
+    const init = async () => {
+      await initializeAuth();
+      setHasInitialized(true);
+    };
+    
+    init();
   }, [initializeAuth]);
 
   useEffect(() => {
-    if (!isLoading) {
+    // Only navigate after auth has been initialized
+    if (hasInitialized && !isLoading) {
       if (isAuthenticated) {
         router.replace('/(tabs)');
       } else {
         router.replace('/(auth)/signin');
       }
     }
-  }, [isAuthenticated, isLoading]);
+  }, [isAuthenticated, isLoading, hasInitialized]);
 
   // Show loading spinner while checking auth
   return (

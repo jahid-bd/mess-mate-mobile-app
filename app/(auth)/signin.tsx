@@ -103,7 +103,7 @@ export default function SignInScreen() {
       <ScrollView
         style={{
           flex: 1,
-          backgroundColor: colors.background.secondary,
+          backgroundColor: colors.background.primary
         }}
         contentContainerStyle={{
           flexGrow: 1,
@@ -127,12 +127,7 @@ export default function SignInScreen() {
           </Text>
         </View>
 
-        <Card style={{ 
-          padding: 24,
-          backgroundColor: colors.background.primary,
-          borderWidth: 1,
-          borderColor: colors.border.primary
-        }}>
+        <View>
           <View style={{ gap: 20 }}>
             <View>
               <Input
@@ -193,7 +188,7 @@ export default function SignInScreen() {
                     }}
                   >
                     {showPassword ? (
-                      <EyeOff size={20} color={colors.icon.secondary} />
+                      <EyeOff size={20} color={colors.border.secondary} />
                     ) : (
                       <Eye size={20} color={colors.icon.secondary} />
                     )}
@@ -228,7 +223,7 @@ export default function SignInScreen() {
               </Button>
             </View>
           </View>
-        </Card>
+        </View>
 
         <View style={{ 
           flexDirection: 'row', 

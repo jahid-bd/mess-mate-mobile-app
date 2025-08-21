@@ -68,7 +68,7 @@ export function ExpensesList({
     <View style={{ 
       paddingHorizontal: 16, 
       paddingVertical: 8, 
-      backgroundColor: colors.background.secondary 
+      backgroundColor: colors.background.primary
     }}>
       <Text style={{ 
         fontSize: 14, 
@@ -140,7 +140,7 @@ export function ExpensesList({
       }
       contentContainerStyle={{ 
         paddingBottom: 16,
-        backgroundColor: colors.background.secondary 
+        backgroundColor: colors.background.primary
       }}
       showsVerticalScrollIndicator={false}
       refreshControl={
@@ -152,7 +152,7 @@ export function ExpensesList({
         />
       }
       ListHeaderComponent={ListHeaderComponent}
-      style={{ backgroundColor: colors.background.secondary }}
+      style={{ backgroundColor: colors.background.primary }}
     />
   );
 }
