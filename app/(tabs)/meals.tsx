@@ -59,15 +59,7 @@ export default function MealsScreen() {
     userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
   });
 
-  console.log("Query params:", {
-    month: selectedMonth,
-    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
-    sortBy,
-    order: sortOrder,
-    limit: 50,
-  });
-  console.log("Meals data:", mealsResponse);
-  console.log("Stats data:", mealsResponse?.stats || separateStats);
+
 
   // Extract meals from response
   const meals = mealsResponse?.data || [];

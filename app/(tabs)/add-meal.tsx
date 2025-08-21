@@ -17,7 +17,6 @@ import { useActiveUsersQuery } from '../../src/hooks/useUsersQuery';
 import { mealApi } from '../../src/api/meals';
 import { DatePicker } from '../../src/components/DatePicker';
 import { UserSelector } from '../../src/components/UserSelector';
-import { ProfileHeader } from '@/src/components/ProfileHeader';
 import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
 import { X } from 'lucide-react-native';
 
@@ -108,10 +107,28 @@ const getMealEmoji = (type: MealType): string => {
         userId: isAdmin ? formData.userId || undefined : undefined,
       });
       
+      // Reset form data
+      setFormData({
+        type: 'LUNCH' as MealType,
+        amount: 1,
+        note: '',
+        date: new Date().toISOString().split('T')[0],
+        userId: user?.id || null,
+      });
+      
+      // Clear any errors
+      setErrors({});
+      
       Alert.alert(
         'Success',
         'Meal entry added successfully!',
-        [{ text: 'OK', onPress: () => router.back() }]
+        [{ 
+          text: 'OK', 
+          onPress: () => {
+            // Navigate to meals page instead of going back
+            router.push('/(tabs)/meals');
+          }
+        }]
       );
     } catch (error: any) {
       console.error('Error creating meal entry:', error);
