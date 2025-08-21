@@ -78,7 +78,7 @@ export default function TabLayout() {
             <TabBarIcon Icon={DollarSign} color={color} focused={focused} />
           ),
           headerTitle: 'Expense Tracking',
-
+          headerShown: false,
         }}
       />
       <Tabs.Screen
