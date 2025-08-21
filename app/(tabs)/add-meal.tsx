@@ -67,14 +67,30 @@ export default function AddMealEntry() {
   // Load meal data in edit mode
   useEffect(() => {
     if (isEditMode && params.id) {
+      // Format date properly for edit mode
+      let dateString = (params.date as string) || new Date().toISOString().split('T')[0];
+      
+      // Ensure date is in YYYY-MM-DD format
+      if (dateString && dateString.length > 10) {
+        // If it's a full ISO string, extract just the date part
+        dateString = dateString.split('T')[0];
+      }
+      
+      // Validate and fix the date format
+      if (dateString && !/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+        console.warn('Invalid date format received:', dateString);
+        dateString = new Date().toISOString().split('T')[0];
+      }
+      
       const loadedData = {
         type: (params.type as MealType) || 'LUNCH',
         amount: params.amount ? parseInt(params.amount as string, 10) : 1,
         note: params.note ? decodeURIComponent(params.note as string) : '',
-        date: (params.date as string) || new Date().toISOString().split('T')[0],
+        date: dateString,
         userId: params.userId ? parseInt(params.userId as string, 10) : user?.id || null,
       };
       
+      console.log('Loading edit data:', loadedData); // Debug log
       setFormData(loadedData);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -123,8 +139,21 @@ const getMealEmoji = (type: MealType): string => {
     
     if (!formData.date) {
       newErrors.date = 'Date is required';
-    } else if (!/^\d{4}-\d{2}-\d{2}$/.test(formData.date)) {
-      newErrors.date = 'Invalid date format';
+    } else {
+      // More robust date validation
+      console.log('Validating date:', formData.date); // Debug log
+      const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+      if (!dateRegex.test(formData.date)) {
+        console.warn('Date regex failed for:', formData.date); // Debug log
+        newErrors.date = 'Invalid date format';
+      } else {
+        // Check if it's a valid date
+        const testDate = new Date(formData.date);
+        if (isNaN(testDate.getTime()) || testDate.toISOString().split('T')[0] !== formData.date) {
+          console.warn('Date validation failed for:', formData.date); // Debug log
+          newErrors.date = 'Invalid date';
+        }
+      }
     }
 
     if (isAdmin && !formData.userId) {

@@ -144,7 +144,14 @@ export default function MealsScreen() {
   };
 
   const handleEditMeal = (meal: MealEntry) => {
-    router.push(`/(tabs)/add-meal?id=${meal.id}&mode=edit&type=${meal.type}&amount=${meal.amount}&note=${encodeURIComponent(meal.note || '')}&date=${meal.date}&userId=${meal.userId}`);
+    // Ensure date is in YYYY-MM-DD format
+    let dateString = meal.date;
+    if (dateString && dateString.length > 10) {
+      // If it's a full ISO string, extract just the date part
+      dateString = dateString.split('T')[0];
+    }
+    
+    router.push(`/(tabs)/add-meal?id=${meal.id}&mode=edit&type=${meal.type}&amount=${meal.amount}&note=${encodeURIComponent(meal.note || '')}&date=${dateString}&userId=${meal.userId}`);
   };
 
   const handleDeleteMeal = (meal: MealEntry) => {
