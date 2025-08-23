@@ -8,9 +8,13 @@ export function useCreateMealMutation() {
   return useMutation({
     mutationFn: (data: CreateMealEntryRequest) => mealApi.createMealEntry(data),
     onSuccess: () => {
-      // Invalidate and refetch meal entries
+      // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
+      
+      // Force refetch by removing cached data
+      queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
 }
@@ -22,9 +26,13 @@ export function useUpdateMealMutation() {
     mutationFn: ({ id, data }: { id: number; data: Partial<CreateMealEntryRequest> }) =>
       mealApi.updateMealEntry(id, data),
     onSuccess: () => {
-      // Invalidate and refetch meal entries
+      // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
+      
+      // Force refetch by removing cached data
+      queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
 }
@@ -35,9 +43,13 @@ export function useDeleteMealMutation() {
   return useMutation({
     mutationFn: (id: number) => mealApi.deleteMealEntry(id),
     onSuccess: () => {
-      // Invalidate and refetch meal entries
+      // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
+      
+      // Force refetch by removing cached data
+      queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
 }

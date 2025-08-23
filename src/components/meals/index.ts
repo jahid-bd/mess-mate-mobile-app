@@ -4,6 +4,8 @@ export { MealEntryCard } from './MealEntryCard';
 export { EmptyMealsList } from './EmptyMealsList';
 export { MealsList } from './MealsList';
 export { MealsHeader } from './MealsHeader';
+export { MealListSkeleton } from './MealListSkeleton';
+export { MealListError } from './MealListError';
 
 // Export types for better reusability
 export interface MealEntry {

@@ -17,7 +17,9 @@ export const useMealsQuery = (params: UseMealsQueryParams = {}) => {
     queryKey: ['meals', params],
     queryFn: () => mealApi.getMealEntries(params),
     enabled: true,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // 30 seconds - more aggressive refresh
+    refetchOnWindowFocus: true, // Refetch when app comes into focus
+    refetchOnMount: true, // Always refetch on mount
   });
 };
 
@@ -30,7 +32,9 @@ export const useMealStatsQuery = (params: {
     queryKey: ['meal-stats', params],
     queryFn: () => mealApi.getMealStats(params),
     enabled: true,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds - more aggressive refresh
+    refetchOnWindowFocus: true, // Refetch when app comes into focus
+    refetchOnMount: true, // Always refetch on mount
   });
 };
 

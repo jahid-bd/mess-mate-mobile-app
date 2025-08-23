@@ -16,10 +16,61 @@ interface MealStats {
 
 interface MealStatisticsProps {
   stats: MealStats;
+  isLoading?: boolean;
 }
 
-export function MealStatistics({ stats }: MealStatisticsProps) {
+export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps) {
   const colors = useThemeColors();
+
+  const SkeletonCard = () => (
+    <Card style={{ 
+      flex: 1, 
+      padding: 12,
+      backgroundColor: colors.background.primary,
+      borderWidth: 1,
+      borderColor: colors.border.primary
+    }}>
+      <View style={{
+        width: 40,
+        height: 12,
+        backgroundColor: colors.background.secondary,
+        borderRadius: 4,
+        marginBottom: 4,
+      }} />
+      <View style={{
+        width: 30,
+        height: 20,
+        backgroundColor: colors.background.secondary,
+        borderRadius: 4,
+      }} />
+    </Card>
+  );
+
+  if (isLoading) {
+    return (
+      <View style={{ marginBottom: 20 }}>
+        <Text style={{ 
+          fontSize: 18, 
+          fontWeight: '600', 
+          color: colors.text.primary, 
+          marginBottom: 12 
+        }}>
+          Meal Statistics
+        </Text>
+        
+        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+          <SkeletonCard />
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <SkeletonCard />
+          <SkeletonCard />
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View style={{ marginBottom: 20 }}>

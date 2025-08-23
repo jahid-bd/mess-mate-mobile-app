@@ -2,6 +2,8 @@ import React from 'react';
 import { View, Text, FlatList, RefreshControl } from 'react-native';
 import { MealEntryCard } from './MealEntryCard';
 import { EmptyMealsList } from './EmptyMealsList';
+import { MealListSkeleton } from './MealListSkeleton';
+import { MealListError } from './MealListError';
 import { useThemeColors } from '../../hooks/useThemeColors';
 
 export interface MealEntry {
@@ -31,6 +33,8 @@ interface MealsListProps {
   onAddMeal: () => void;
   onRefresh: () => void;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
+  error?: Error;
+  onRetry?: () => void;
 }
 
 export function MealsList({
@@ -43,7 +47,9 @@ export function MealsList({
   onMealAction,
   onAddMeal,
   onRefresh,
-  ListHeaderComponent
+  ListHeaderComponent,
+  error,
+  onRetry
 }: MealsListProps) {
   const colors = useThemeColors();
 
@@ -114,6 +120,35 @@ export function MealsList({
     return renderMealItem({ item, index });
   };
 
+  // Show loading skeleton on first load
+  if (isLoading && meals.length === 0) {
+    return (
+      <View style={{ flex: 1 }}>
+        {ListHeaderComponent && (
+          React.isValidElement(ListHeaderComponent) ? 
+            ListHeaderComponent : 
+            React.createElement(ListHeaderComponent)
+        )}
+        <MealListSkeleton />
+      </View>
+    );
+  }
+
+  // Show error state
+  if (error && meals.length === 0) {
+    return (
+      <View style={{ flex: 1 }}>
+        {ListHeaderComponent && (
+          React.isValidElement(ListHeaderComponent) ? 
+            ListHeaderComponent : 
+            React.createElement(ListHeaderComponent)
+        )}
+        <MealListError error={error} onRetry={onRetry} />
+      </View>
+    );
+  }
+
+  // Show empty state when no meals and not loading
   if (meals.length === 0 && !isLoading) {
     return (
       <View style={{ flex: 1, padding: 16 }}>

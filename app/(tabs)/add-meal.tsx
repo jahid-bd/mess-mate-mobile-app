@@ -13,8 +13,7 @@ import { Card } from '../../components/ui/card';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
 import { useActiveUsersQuery } from '../../src/hooks/useUsersQuery';
-import { useUpdateMealMutation } from '../../src/hooks/useMealMutations';
-import { mealApi } from '../../src/api/meals';
+import { useCreateMealMutation, useUpdateMealMutation } from '../../src/hooks/useMealMutations';
 import { DatePicker } from '../../src/components/DatePicker';
 import { UserSelector } from '../../src/components/UserSelector';
 import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
@@ -37,6 +36,7 @@ export default function AddMealEntry() {
   const { data: activeUsers = [], isLoading: usersLoading } = useActiveUsersQuery();
   
   // Mutation hooks
+  const createMealMutation = useCreateMealMutation();
   const updateMealMutation = useUpdateMealMutation();
   
   const [formData, setFormData] = useState({
@@ -185,13 +185,11 @@ const getMealEmoji = (type: MealType): string => {
         
         showToast('Meal entry updated successfully!', 'success');
         
-        // Navigate after a brief delay to show the toast
-        setTimeout(() => {
-          router.push('/(tabs)/meals');
-        }, 1500);
+        // Navigate immediately after successful mutation (cache invalidation is handled automatically)
+        router.push('/(tabs)/meals');
       } else {
         // Create new meal
-        await mealApi.createMealEntry({
+        await createMealMutation.mutateAsync({
           type: formData.type,
           amount: formData.amount,
           note: formData.note || undefined,
@@ -213,10 +211,8 @@ const getMealEmoji = (type: MealType): string => {
         
         showToast('Meal entry added successfully!', 'success');
         
-        // Navigate after a brief delay to show the toast
-        setTimeout(() => {
-          router.push('/(tabs)/meals');
-        }, 1500);
+        // Navigate immediately after successful mutation (cache invalidation is handled automatically)
+        router.push('/(tabs)/meals');
       }
     } catch (error: any) {
       console.error('Error saving meal entry:', error);

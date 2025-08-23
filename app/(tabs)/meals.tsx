@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Alert } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
@@ -74,10 +74,16 @@ export default function MealsScreen() {
     includeStats: true, // Request stats with the meals data
   });
 
+  // Auto-refetch when screen comes into focus (after navigation from add-meal)
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+    }, [refetch])
+  );
+
   // Get stats from API response or use separate stats query as fallback
   const { 
     data: separateStats,
-    isLoading: statsLoading 
   } = useMealStatsQuery({
     month: selectedMonth,
     userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
@@ -237,7 +243,7 @@ export default function MealsScreen() {
     <View style={{ backgroundColor: colors.background.primary }}>
       <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
         {/* Meal Statistics */}
-        <MealStatistics stats={stats} />
+        <MealStatistics stats={stats} isLoading={isLoading} />
 
         {/* Header Actions */}
         <MealsHeader
@@ -305,32 +311,6 @@ export default function MealsScreen() {
             onSortOrderChange={handleSortOrderChange}
           />
         )}
-
-        {/* Loading State */}
-        {(isLoading || (!mealsResponse?.stats && statsLoading)) && (
-          <View style={{ padding: 20, alignItems: 'center' }}>
-            <Button action="secondary" variant="outline" disabled>
-              <ButtonText>Loading meals...</ButtonText>
-            </Button>
-          </View>
-        )}
-
-        {/* Error State */}
-        {isError && (
-          <View style={{ padding: 20, alignItems: 'center' }}>
-            <Button action="negative" variant="outline" disabled>
-              <ButtonText>Error: {error?.message || 'Failed to load meals'}</ButtonText>
-            </Button>
-            <Button 
-              action="primary" 
-              variant="solid" 
-              style={{ marginTop: 8 }}
-              onPress={() => refetch()}
-            >
-              <ButtonText>Retry</ButtonText>
-            </Button>
-          </View>
-        )}
       </View>
     </View>
   );
@@ -339,21 +319,21 @@ export default function MealsScreen() {
     <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
       <HeaderWithLogo title='Meal Entries' />
 
-      {/* Meal Entries List with integrated header - only show when not loading and no error */}
-      {!isLoading && !isError && (
-        <MealsList
-          meals={filteredMeals as any} // Temporary type assertion to fix type conflict
-          currentUserId={user?.id}
-          showOnlyMyMeals={showOnlyMyMeals}
-          isAdmin={isAdmin}
-          isLoading={isLoading}
-          isRefreshing={isRefreshing}
-          onMealAction={showMealActions as any} // Temporary type assertion
-          onAddMeal={handleAddMeal}
-          onRefresh={handleRefresh}
-          ListHeaderComponent={ListHeaderComponent}
-        />
-      )}
+      {/* Always show the MealsList component with loading/error states handled internally */}
+      <MealsList
+        meals={isLoading || isError ? [] : (filteredMeals as any)} // Show empty array while loading
+        currentUserId={user?.id}
+        showOnlyMyMeals={showOnlyMyMeals}
+        isAdmin={isAdmin}
+        isLoading={isLoading}
+        isRefreshing={isRefreshing}
+        onMealAction={showMealActions as any}
+        onAddMeal={handleAddMeal}
+        onRefresh={handleRefresh}
+        ListHeaderComponent={ListHeaderComponent}
+        error={isError ? error : undefined}
+        onRetry={() => refetch()}
+      />
 
       {/* Month Picker Modal */}
       <MonthPicker
