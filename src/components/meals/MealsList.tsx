@@ -5,6 +5,7 @@ import { EmptyMealsList } from './EmptyMealsList';
 import { MealListSkeleton } from './MealListSkeleton';
 import { MealListError } from './MealListError';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { Button, ButtonText, ButtonSpinner } from '../../../components/ui/button';
 
 export interface MealEntry {
   id: number;
@@ -35,6 +36,9 @@ interface MealsListProps {
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
   error?: Error;
   onRetry?: () => void;
+  onLoadMore?: () => void;
+  hasNextPage?: boolean;
+  isFetchingNextPage?: boolean;
 }
 
 export function MealsList({
@@ -49,9 +53,19 @@ export function MealsList({
   onRefresh,
   ListHeaderComponent,
   error,
-  onRetry
+  onRetry,
+  onLoadMore,
+  hasNextPage,
+  isFetchingNextPage
 }: MealsListProps) {
   const colors = useThemeColors();
+
+  console.log('MealsList Pagination Debug:', {
+    mealsCount: meals.length,
+    hasNextPage,
+    isFetchingNextPage,
+    onLoadMoreExists: !!onLoadMore
+  });
 
   const canEditMeal = (meal: MealEntry) => {
     return isAdmin || meal.userId === currentUserId;
@@ -120,6 +134,61 @@ export function MealsList({
     return renderMealItem({ item, index });
   };
 
+  const renderFooter = () => {
+    console.log('MealsList renderFooter Debug:', {
+      hasNextPage,
+      isFetchingNextPage,
+      mealsLength: meals.length
+    });
+
+    if (!hasNextPage && !isFetchingNextPage) {
+      return null;
+    }
+
+    if (isFetchingNextPage) {
+      return (
+        <View style={{ 
+          padding: 20, 
+          alignItems: 'center',
+          backgroundColor: colors.background.primary 
+        }}>
+          <Button
+            action="primary"
+            variant="solid"
+            size="lg"
+            className="min-w-32"
+            disabled={true}
+          >
+            <ButtonSpinner color="white" />
+            <ButtonText className='text-sm'>Loading...</ButtonText>
+          </Button>
+        </View>
+      );
+    }
+
+    if (hasNextPage) {
+      return (
+        <View style={{ 
+          padding: 20, 
+          alignItems: 'center',
+          backgroundColor: colors.background.primary 
+        }}>
+          <Button
+            onPress={onLoadMore}
+            action="primary"
+            variant="solid"
+            size="lg"
+            className="min-w-32"
+          >
+            <ButtonText className='text-sm'>Load More</ButtonText>
+          </Button>
+        </View>
+      );
+    }
+
+    return null;
+  };
+
   // Show loading skeleton on first load
   if (isLoading && meals.length === 0) {
     return (
@@ -172,7 +241,7 @@ export function MealsList({
       data={groupedData}
       renderItem={renderItem}
       keyExtractor={(item, index) => 
-        item.type === 'header' ? `header-${item.date}` : `meal-${item.id}`
+        item.type === 'header' ? `header-${item.date}-${index}` : `meal-${item.id}-${index}`
       }
       contentContainerStyle={{ 
         paddingBottom: 16,
@@ -188,6 +257,7 @@ export function MealsList({
         />
       }
       ListHeaderComponent={ListHeaderComponent}
+      ListFooterComponent={renderFooter}
       style={{ backgroundColor: colors.background.primary }}
     />
   );

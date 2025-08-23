@@ -68,8 +68,8 @@ export function MealListError({ error, onRetry }: MealListErrorProps) {
             onPress={onRetry}
             style={{
               backgroundColor: colors.primary[500],
-              paddingHorizontal: 24,
-              paddingVertical: 12,
+              // paddingHorizontal: 24,
+              // paddingVertical: 12,
               flexDirection: 'row',
               alignItems: 'center',
             }}

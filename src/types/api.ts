@@ -80,7 +80,7 @@ export interface CreateExpenseRequest {
 
 export interface PaginatedResponse<T> {
   data: T[];
-  pagination: {
+  meta: {
     page: number;
     limit: number;
     total: number;

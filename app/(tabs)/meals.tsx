@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Alert } from 'react-native';
-import { router, useFocusEffect } from 'expo-router';
+import { router } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
-import { useMealsQuery, useMealStatsQuery } from '../../src/hooks/useMealsQuery';
+import { useMealsQuery, useMealStatsQuery, useInfiniteMealsQuery } from '../../src/hooks/useMealsQuery';
 import { useDeleteMealMutation } from '../../src/hooks/useMealMutations';
 import { MonthPicker } from '../../src/components/MonthPicker';
 import { UserPicker } from '../../src/components/UserPicker';
@@ -58,28 +58,24 @@ export default function MealsScreen() {
     });
   };
 
-  // React Query for meals data with comprehensive filtering and stats
+  // React Query for meals data with infinite pagination
   const { 
-    data: mealsResponse, 
+    data: mealsInfiniteData, 
     isLoading, 
     isError, 
     error, 
-    refetch 
-  } = useMealsQuery({
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteMealsQuery({
     month: selectedMonth,
     userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
     sortBy,
     order: sortOrder,
-    limit: 50,
     includeStats: true, // Request stats with the meals data
   });
 
-  // Auto-refetch when screen comes into focus (after navigation from add-meal)
-  useFocusEffect(
-    useCallback(() => {
-      refetch();
-    }, [refetch])
-  );
 
   // Get stats from API response or use separate stats query as fallback
   const { 
@@ -91,11 +87,21 @@ export default function MealsScreen() {
 
 
 
-  // Extract meals from response
-  const meals = mealsResponse?.data || [];
+  // Extract meals from infinite query pages and deduplicate by ID
+  const allMeals = mealsInfiniteData?.pages?.flatMap(page => page.data) || [];
+  const meals = allMeals.filter((meal, index, array) => 
+    array.findIndex(m => m.id === meal.id) === index
+  );
 
-  // Use stats from API response, fallback to separate stats query, or empty stats
-  const apiStats = mealsResponse?.stats || separateStats;
+  console.log('Meals Debug:', {
+    totalPages: mealsInfiniteData?.pages?.length,
+    allMealsCount: allMeals.length,
+    uniqueMealsCount: meals.length,
+    duplicatesRemoved: allMeals.length - meals.length
+  });
+
+  // Use stats from first page's API response, fallback to separate stats query, or empty stats
+  const apiStats = mealsInfiniteData?.pages?.[0]?.stats || separateStats;
   const stats: MealStats = apiStats ? {
     ...apiStats,
     userMeals: apiStats.userMeals || 0, // Convert null to 0
@@ -195,6 +201,12 @@ export default function MealsScreen() {
     setIsRefreshing(true);
     await refetch();
     setIsRefreshing(false);
+  };
+
+  const handleLoadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
   };
 
   // Filter change handlers that trigger new API calls
@@ -333,6 +345,9 @@ export default function MealsScreen() {
         ListHeaderComponent={ListHeaderComponent}
         error={isError ? error : undefined}
         onRetry={() => refetch()}
+        onLoadMore={handleLoadMore}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
       />
 
       {/* Month Picker Modal */}

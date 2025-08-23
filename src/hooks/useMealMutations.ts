@@ -10,10 +10,12 @@ export function useCreateMealMutation() {
     onSuccess: () => {
       // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['meals-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
       
       // Force refetch by removing cached data
       queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meals-infinite'] });
       queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
@@ -28,10 +30,12 @@ export function useUpdateMealMutation() {
     onSuccess: () => {
       // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['meals-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
       
       // Force refetch by removing cached data
       queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meals-infinite'] });
       queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
@@ -45,10 +49,12 @@ export function useDeleteMealMutation() {
     onSuccess: () => {
       // Invalidate all meal-related queries
       queryClient.invalidateQueries({ queryKey: ['meals'] });
+      queryClient.invalidateQueries({ queryKey: ['meals-infinite'] });
       queryClient.invalidateQueries({ queryKey: ['meal-stats'] });
       
       // Force refetch by removing cached data
       queryClient.removeQueries({ queryKey: ['meals'] });
+      queryClient.removeQueries({ queryKey: ['meals-infinite'] });
       queryClient.removeQueries({ queryKey: ['meal-stats'] });
     },
   });
