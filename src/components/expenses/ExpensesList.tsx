@@ -106,6 +106,8 @@ export function ExpensesList({
     return flatData;
   };
 
+  console.log(groupExpensesByDate);
+
   const renderItem = ({ item, index }: { item: any; index: number }) => {
     if (item.type === 'header') {
       return renderSectionHeader(item.date);

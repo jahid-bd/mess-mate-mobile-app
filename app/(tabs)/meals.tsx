@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView, RefreshControl, Alert } from 'react-native';
+import { View, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
@@ -233,31 +233,17 @@ export default function MealsScreen() {
   // Since we're using server-side filtering and sorting, we can use meals directly
   const filteredMeals = meals;
 
-  return (
-    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
-      <HeaderWithLogo title='Meal Entries' />
+  const ListHeaderComponent = () => (
+    <View style={{ backgroundColor: colors.background.primary }}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 16 }}>
+        {/* Meal Statistics */}
+        <MealStatistics stats={stats} />
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary[500]}
-          />
-        }
-      >
         {/* Header Actions */}
         <MealsHeader
           showFilters={showFilters}
           onAddMeal={handleAddMeal}
           onToggleFilters={() => setShowFilters(!showFilters)}
-        />
-
-        {/* Meal Statistics */}
-        <MealStatistics
-          stats={stats}
         />
 
         {/* Active Filters Indicator */}
@@ -345,30 +331,29 @@ export default function MealsScreen() {
             </Button>
           </View>
         )}
+      </View>
+    </View>
+  );
 
-        {/* Meal Entries List - only show when not loading and no error */}
-        {!isLoading && !isError && (
-          <MealsList
-            meals={filteredMeals as any} // Temporary type assertion to fix type conflict
-            currentUserId={user?.id}
-            showOnlyMyMeals={showOnlyMyMeals}
-            isAdmin={isAdmin}
-            onMealAction={showMealActions as any} // Temporary type assertion
-            onAddMeal={handleAddMeal}
-          />
-        )}
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background.primary }}>
+      <HeaderWithLogo title='Meal Entries' />
 
-        {/* Load More Button (Pagination) */}
-        {filteredMeals.length > 0 && (
-          <Button 
-            action="secondary" 
-            variant="outline" 
-            style={{ marginTop: 16 }}
-          >
-            <ButtonText>Load More Entries</ButtonText>
-          </Button>
-        )}
-      </ScrollView>
+      {/* Meal Entries List with integrated header - only show when not loading and no error */}
+      {!isLoading && !isError && (
+        <MealsList
+          meals={filteredMeals as any} // Temporary type assertion to fix type conflict
+          currentUserId={user?.id}
+          showOnlyMyMeals={showOnlyMyMeals}
+          isAdmin={isAdmin}
+          isLoading={isLoading}
+          isRefreshing={isRefreshing}
+          onMealAction={showMealActions as any} // Temporary type assertion
+          onAddMeal={handleAddMeal}
+          onRefresh={handleRefresh}
+          ListHeaderComponent={ListHeaderComponent}
+        />
+      )}
 
       {/* Month Picker Modal */}
       <MonthPicker
