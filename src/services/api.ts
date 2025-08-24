@@ -1,4 +1,4 @@
-import * as SecureStore from 'expo-secure-store';
+import { Storage } from '../utils/storage';
 import { API_CONFIG } from '../utils/constants';
 import { 
   LoginRequest, 
@@ -19,10 +19,11 @@ class ApiClient {
   constructor() {
     this.baseURL = API_CONFIG.BASE_URL;
     this.timeout = API_CONFIG.TIMEOUT;
+    console.log('🔧 API Client initialized with base URL:', this.baseURL);
   }
 
   private async getAuthToken(): Promise<string | null> {
-    return await SecureStore.getItemAsync('authToken');
+    return await Storage.getItem('authToken');
   }
 
   private async request<T>(

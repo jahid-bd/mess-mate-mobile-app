@@ -73,7 +73,7 @@ export function MealFiltersCard({
         <Input className="px-3">
           <Search size={16} color={colors.icon.muted} className="mr-3" />
           <InputField
-            placeholder="Search meals......"
+            placeholder="Search meals..."
             value={filters.searchQuery}
             onChangeText={(text) => handleFilterChange('searchQuery', text)}
             className="flex-1"

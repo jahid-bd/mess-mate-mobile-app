@@ -1,10 +1,9 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as SecureStore from 'expo-secure-store';
+import { Storage } from '../utils/storage';
 import { User } from '../types/api';
 import { userApi } from '../services/api';
-import { DEV_CONFIG } from '../utils/constants';
 
 interface AuthState {
   user: User | null;
@@ -35,7 +34,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoading: true });
           
           // Store token securely
-          await SecureStore.setItemAsync('authToken', authToken);
+          await Storage.setItem('authToken', authToken);
           set({ token: authToken });
           
           // Fetch user profile
@@ -48,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
           
         } catch (error) {
           // Clear token if profile fetch fails
-          await SecureStore.deleteItemAsync('authToken');
+          await Storage.removeItem('authToken');
           set({ 
             token: null, 
             user: null, 
@@ -60,7 +59,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       signOut: async () => {
-        await SecureStore.deleteItemAsync('authToken');
+        await Storage.removeItem('authToken');
         set({
           user: null,
           isAuthenticated: false,
@@ -71,7 +70,7 @@ export const useAuthStore = create<AuthState>()(
       setUser: (user) => set({ user, isAuthenticated: true }),
 
       setToken: async (token) => {
-        await SecureStore.setItemAsync('authToken', token);
+        await Storage.setItem('authToken', token);
         set({ token });
       },
 
@@ -83,7 +82,7 @@ export const useAuthStore = create<AuthState>()(
 
       initializeAuth: async () => {
         try {
-          const token = await SecureStore.getItemAsync('authToken');
+          const token = await Storage.getItem('authToken');
           if (token) {
             set({ token, isLoading: true });
             
