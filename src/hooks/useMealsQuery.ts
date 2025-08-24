@@ -27,6 +27,7 @@ export const useMealsQuery = (params: UseMealsQueryParams = {}) => {
 
 // Hook for infinite/paginated meals
 export const useInfiniteMealsQuery = (params: Omit<UseMealsQueryParams, 'page' | 'limit'> = {}) => {
+  console.log("params from useInfiniteMealsQuery:",params);
   return useInfiniteQuery<PaginatedResponse<MealEntry> & { stats?: MealStats }>({
     queryKey: ['meals-infinite', params],
     queryFn: ({ pageParam = 1 }) => mealApi.getMealEntries({
@@ -41,20 +42,6 @@ export const useInfiniteMealsQuery = (params: Omit<UseMealsQueryParams, 'page' |
     getNextPageParam: (lastPage) => {
       const { meta } = lastPage;
       
-      console.log('Pagination Debug:', {
-        meta,
-        lastPage,
-        hasMeta: !!meta,
-        currentPage: meta?.page,
-        totalPages: meta?.totalPages,
-        hasMore: meta ? meta.page < meta.totalPages : false
-      });
-
-      // If meta is not provided or doesn't exist, assume no more pages
-      if (!meta) {
-        console.log('No meta object found');
-        return undefined;
-      }
 
       const currentPage = meta.page;
       const totalPages = meta.totalPages;

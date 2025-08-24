@@ -1,245 +1,295 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Card } from '../../../components/ui/card';
-import { Button, ButtonText, ButtonIcon } from '../../../components/ui/button';
-import { Calendar, User as UserIcon } from 'lucide-react-native';
+import { Button, ButtonText } from '../../../components/ui/button';
+import { Input, InputField } from '../../../components/ui/input';
+import { Calendar, User as UserIcon, Search, UtensilsCrossed } from 'lucide-react-native';
 import { useThemeColors } from '../../hooks/useThemeColors';
+import { FilterOptions } from '../../hooks/useFilterOptions';
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
+export interface MealFilters {
+  selectedMonth: string;
+  selectedUserId: number | null;
+  selectedType: 'ALL' | 'BREAKFAST' | 'LUNCH' | 'DINNER';
+  searchQuery: string;
 }
 
 interface MealFiltersCardProps {
-  selectedMonth: string;
-  showOnlyMyMeals: boolean;
-  selectedUser: number | null;
-  sortBy: 'date' | 'type' | 'user';
-  sortOrder: 'asc' | 'desc';
-  isAdmin: boolean;
-  users: User[];
-  onMonthPickerOpen: () => void;
-  onUserPickerOpen: () => void;
-  onToggleMyMeals: () => void;
-  onSortByChange: (sortBy: 'date' | 'type' | 'user') => void;
-  onSortOrderChange: (sortOrder: 'asc' | 'desc') => void;
+  filters: MealFilters;
+  filterOptions: FilterOptions | undefined;
+  onFiltersChange: (filters: MealFilters) => void;
+  style?: any;
 }
 
-export function MealFiltersCard({
-  selectedMonth,
-  showOnlyMyMeals,
-  selectedUser,
-  sortBy,
-  sortOrder,
-  isAdmin,
-  users,
-  onMonthPickerOpen,
-  onUserPickerOpen,
-  onToggleMyMeals,
-  onSortByChange,
-  onSortOrderChange,
+export function MealFiltersCard({ 
+  filters, 
+  filterOptions, 
+  onFiltersChange, 
+  style 
 }: MealFiltersCardProps) {
   const colors = useThemeColors();
 
-  const getSelectedUserName = () => {
-    if (!selectedUser) return 'All Users';
-    const user = users.find(u => u.id === selectedUser);
-    return user ? (user.name || user.email || 'Unknown User') : 'All Users';
+  const handleFilterChange = (key: keyof MealFilters, value: any) => {
+    onFiltersChange({
+      ...filters,
+      [key]: value
+    });
   };
 
+  // Get data from filter options API with fallbacks
+  const months = filterOptions?.months || [];
+  const users = filterOptions?.users || [];
+  const mealTypes = [
+    { value: 'ALL', label: 'All Types' },
+    ...(filterOptions?.mealTypes || [])
+  ];
+
   return (
-    <Card style={{ 
+    <Card style={[{ 
       padding: 16, 
-      marginBottom: 16,
       backgroundColor: colors.background.primary,
       borderWidth: 1,
-      borderColor: colors.border.primary
-    }}>
+      borderColor: colors.border.primary 
+    }, style]}>
       <Text style={{ 
         fontSize: 16, 
         fontWeight: '600', 
-        color: colors.text.primary, 
-        marginBottom: 12 
+        color: colors.text.primary,
+        marginBottom: 16 
       }}>
-        Filters & Sorting
+        Filter Meals
       </Text>
-      
-      <View style={{ gap: 12 }}>
-        {/* Month Filter */}
-        <View>
-          <Text style={{ 
-            fontSize: 14, 
-            color: colors.text.secondary, 
-            marginBottom: 8 
-          }}>
-            Month
-          </Text>
-          <Button 
-            action="default" 
-            variant="outline"
-            style={{ 
-              justifyContent: 'flex-start',
-              borderColor: colors.border.primary,
-              backgroundColor: 'transparent'
-            }}
-            onPress={onMonthPickerOpen}
-          >
-            <ButtonIcon as={Calendar} size="sm" />
-            <ButtonText>
-              {selectedMonth}
-            </ButtonText>
-          </Button>
-        </View>
 
-        {/* Person Filter */}
-        <View>
-          <Text style={{ 
-            fontSize: 14, 
-            color: colors.text.secondary, 
-            marginBottom: 8 
-          }}>
-            Filter by Person
-          </Text>
-          <Button 
-            action="secondary" 
-            variant="outline"
-            style={{ 
-              justifyContent: 'flex-start',
-              borderColor: colors.border.primary,
-              backgroundColor: 'transparent'
-            }}
-            onPress={onUserPickerOpen}
-          >
-            <ButtonIcon as={UserIcon} size="sm" />
-            <ButtonText>
-              {getSelectedUserName()}
-            </ButtonText>
-          </Button>
-        </View>
+      {/* Search */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={{ 
+          fontSize: 14, 
+          fontWeight: '500', 
+          color: colors.text.primary,
+          marginBottom: 8 
+        }}>
+          Search
+        </Text>
+        <Input className="px-3">
+          <Search size={16} color={colors.icon.muted} className="mr-3" />
+          <InputField
+            placeholder="Search meals......"
+            value={filters.searchQuery}
+            onChangeText={(text) => handleFilterChange('searchQuery', text)}
+            className="flex-1"
+          />
+        </Input>
+      </View>
 
-        {/* Toggle My Meals Only */}
-        {!isAdmin && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <Pressable 
-              style={{
-                backgroundColor: showOnlyMyMeals ? colors.primary[500] : 'transparent',
-                borderWidth: 1,
-                borderColor: showOnlyMyMeals ? colors.primary[500] : colors.border.primary,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                minHeight: 36,
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 8
-              }}
-              onPress={onToggleMyMeals}
-            >
-              <UserIcon 
-                size={16} 
-                color={showOnlyMyMeals ? colors.text.inverse : colors.icon.muted} 
-              />
-              <Text style={{
-                color: showOnlyMyMeals ? colors.text.inverse : colors.text.primary,
-                fontSize: 14,
-                fontWeight: '500'
-              }}>
-                My Meals Only
-              </Text>
-            </Pressable>
-          </View>
-        )}
-
-        {/* Sort Options */}
-        <View>
-          <Text style={{ 
-            fontSize: 14, 
-            color: colors.text.secondary, 
-            marginBottom: 8 
-          }}>
-            Sort by
-          </Text>
-          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
-            {['date', 'type', 'user'].map((option) => (
-              <Pressable
-                key={option}
-                style={{
-                  backgroundColor: sortBy === option ? colors.primary[500] : 'transparent',
-                  borderWidth: 1,
-                  borderColor: sortBy === option ? colors.primary[500] : colors.border.primary,
-                  borderRadius: 8,
+      {/* Month Filter */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={{ 
+          fontSize: 14, 
+          fontWeight: '500', 
+          color: colors.text.primary,
+          marginBottom: 8 
+        }}>
+          Month
+        </Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {months.map((month) => (
+            <Pressable
+              key={month.value}
+              onPress={() => handleFilterChange('selectedMonth', month.value)}
+              style={[
+                {
                   paddingHorizontal: 12,
                   paddingVertical: 8,
-                  minHeight: 36,
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
-                onPress={() => onSortByChange(option as any)}
-              >
-                <Text style={{
-                  color: sortBy === option ? colors.text.inverse : colors.text.primary,
-                  fontSize: 14,
-                  fontWeight: '500'
-                }}>
-                  {option.charAt(0).toUpperCase() + option.slice(1)}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-          
-          {/* Sort Order */}
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            <Pressable
-              style={{
-                backgroundColor: sortOrder === 'desc' ? colors.primary[500] : 'transparent',
-                borderWidth: 1,
-                borderColor: sortOrder === 'desc' ? colors.primary[500] : colors.border.primary,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                minHeight: 36,
-                justifyContent: 'center',
-                alignItems: 'center',
-                flex: 1
-              }}
-              onPress={() => onSortOrderChange('desc')}
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                filters.selectedMonth === month.value
+                  ? {
+                      backgroundColor: colors.primary[50],
+                      borderColor: colors.primary[500],
+                    }
+                  : {
+                      backgroundColor: colors.background.primary,
+                      borderColor: colors.border.primary,
+                    }
+              ]}
             >
-              <Text style={{
-                color: sortOrder === 'desc' ? colors.text.inverse : colors.text.primary,
-                fontSize: 14,
-                fontWeight: '500'
-              }}>
-                Newest First
+              <Calendar size={14} color={
+                filters.selectedMonth === month.value 
+                  ? colors.primary[600] 
+                  : colors.icon.muted
+              } />
+              <Text style={[
+                { marginLeft: 6, fontSize: 14 },
+                filters.selectedMonth === month.value
+                  ? { color: colors.primary[700], fontWeight: '500' }
+                  : { color: colors.text.secondary }
+              ]}>
+                {month.label}
               </Text>
             </Pressable>
-            <Pressable
-              style={{
-                backgroundColor: sortOrder === 'asc' ? colors.primary[500] : 'transparent',
-                borderWidth: 1,
-                borderColor: sortOrder === 'asc' ? colors.primary[500] : colors.border.primary,
-                borderRadius: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 8,
-                minHeight: 36,
-                justifyContent: 'center',
-                alignItems: 'center',
-                flex: 1
-              }}
-              onPress={() => onSortOrderChange('asc')}
-            >
-              <Text style={{
-                color: sortOrder === 'asc' ? colors.text.inverse : colors.text.primary,
-                fontSize: 14,
-                fontWeight: '500'
-              }}>
-                Oldest First
-              </Text>
-            </Pressable>
-          </View>
+          ))}
         </View>
       </View>
+
+      {/* User Filter */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={{ 
+          fontSize: 14, 
+          fontWeight: '500', 
+          color: colors.text.primary,
+          marginBottom: 8 
+        }}>
+          User
+        </Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          <Pressable
+            onPress={() => handleFilterChange('selectedUserId', null)}
+            style={[
+              {
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                borderRadius: 8,
+                borderWidth: 1,
+                flexDirection: 'row',
+                alignItems: 'center',
+              },
+              filters.selectedUserId === null
+                ? {
+                    backgroundColor: colors.primary[50],
+                    borderColor: colors.primary[500],
+                  }
+                : {
+                    backgroundColor: colors.background.primary,
+                    borderColor: colors.border.primary,
+                  }
+            ]}
+          >
+            <UserIcon size={14} color={
+              filters.selectedUserId === null 
+                ? colors.primary[600] 
+                : colors.icon.muted
+            } />
+            <Text style={[
+              { marginLeft: 6, fontSize: 14 },
+              filters.selectedUserId === null
+                ? { color: colors.primary[700], fontWeight: '500' }
+                : { color: colors.text.secondary }
+            ]}>
+              All Users
+            </Text>
+          </Pressable>
+          {users.map((user) => (
+            <Pressable
+              key={user.id}
+              onPress={() => handleFilterChange('selectedUserId', user.id)}
+              style={[
+                {
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                filters.selectedUserId === user.id
+                  ? {
+                      backgroundColor: colors.primary[50],
+                      borderColor: colors.primary[500],
+                    }
+                  : {
+                      backgroundColor: colors.background.primary,
+                      borderColor: colors.border.primary,
+                    }
+              ]}
+            >
+              <UserIcon size={14} color={
+                filters.selectedUserId === user.id 
+                  ? colors.primary[600] 
+                  : colors.icon.muted
+              } />
+              <Text style={[
+                { marginLeft: 6, fontSize: 14 },
+                filters.selectedUserId === user.id
+                  ? { color: colors.primary[700], fontWeight: '500' }
+                  : { color: colors.text.secondary }
+              ]}>
+                {user.name}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* Meal Type Filter */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={{ 
+          fontSize: 14, 
+          fontWeight: '500', 
+          color: colors.text.primary,
+          marginBottom: 8 
+        }}>
+          Meal Type
+        </Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {mealTypes.map((type) => (
+            <Pressable
+              key={type.value}
+              onPress={() => handleFilterChange('selectedType', type.value)}
+              style={[
+                {
+                  paddingHorizontal: 12,
+                  paddingVertical: 8,
+                  borderRadius: 8,
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                },
+                filters.selectedType === type.value
+                  ? {
+                      backgroundColor: colors.primary[50],
+                      borderColor: colors.primary[500],
+                    }
+                  : {
+                      backgroundColor: colors.background.primary,
+                      borderColor: colors.border.primary,
+                    }
+              ]}
+            >
+              <UtensilsCrossed size={14} color={
+                filters.selectedType === type.value 
+                  ? colors.primary[600] 
+                  : colors.icon.muted
+              } />
+              <Text style={[
+                { marginLeft: 6, fontSize: 14 },
+                filters.selectedType === type.value
+                  ? { color: colors.primary[700], fontWeight: '500' }
+                  : { color: colors.text.secondary }
+              ]}>
+                {type.label}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+      </View>
+
+      {/* Clear Filters Button */}
+      <Button 
+        action="secondary" 
+        variant="outline"
+        onPress={() => onFiltersChange({
+          selectedMonth: new Date().toISOString().slice(0, 7),
+          selectedUserId: null,
+          selectedType: 'ALL',
+          searchQuery: ''
+        })}
+        style={{ marginTop: 8 }}
+      >
+        <ButtonText>Clear All Filters</ButtonText>
+      </Button>
     </Card>
   );
 }

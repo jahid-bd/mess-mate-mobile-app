@@ -4,19 +4,21 @@ import { router } from 'expo-router';
 import { Button, ButtonText } from '../../components/ui/button';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
 import { useAuthStore } from '../../src/stores/authStore';
-import { useMealsQuery, useMealStatsQuery, useInfiniteMealsQuery } from '../../src/hooks/useMealsQuery';
+import { useInfiniteMealsQuery } from '../../src/hooks/useMealsQuery';
 import { useDeleteMealMutation } from '../../src/hooks/useMealMutations';
+import { useFilterOptions } from '../../src/hooks/useFilterOptions';
 import { MonthPicker } from '../../src/components/MonthPicker';
 import { UserPicker } from '../../src/components/UserPicker';
 import { MealActionModal } from '../../src/components/MealActionModal';
 import { Toast } from '../../src/components/Toast';
-import { MealEntry, User } from '../../src/types/api';
+import { MealEntry } from '../../src/types/api';
 import {
   MealStatistics,
   MealFiltersCard,
   MealsList,
   MealsHeader,
   type MealStats,
+  type MealFilters,
 } from '../../src/components/meals';
 import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
 
@@ -24,6 +26,17 @@ export default function MealsScreen() {
   const colors = useThemeColors();
   const { user } = useAuthStore();
   const isAdmin = user?.role === 'ADMIN';
+  
+  // Fetch filter options
+  const { data: filterOptions } = useFilterOptions();
+  
+  // New unified filter state
+  const [mealFilters, setMealFilters] = useState<MealFilters>({
+    selectedMonth: new Date().toISOString().slice(0, 7), // Current month
+    selectedUserId: null,
+    selectedType: 'ALL',
+    searchQuery: ''
+  });
   
   // State management
   const [selectedMonth, setSelectedMonth] = useState('2025-08');
@@ -46,6 +59,8 @@ export default function MealsScreen() {
     message: '',
     type: 'info',
   });
+
+  console.log("selected month:", selectedMonth);
 
   // Mutation hooks
   const deleteMealMutation = useDeleteMealMutation();
@@ -77,15 +92,6 @@ export default function MealsScreen() {
   });
 
 
-  // Get stats from API response or use separate stats query as fallback
-  const { 
-    data: separateStats,
-  } = useMealStatsQuery({
-    month: selectedMonth,
-    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
-  });
-
-
 
   // Extract meals from infinite query pages and deduplicate by ID
   const allMeals = mealsInfiniteData?.pages?.flatMap(page => page.data) || [];
@@ -93,15 +99,10 @@ export default function MealsScreen() {
     array.findIndex(m => m.id === meal.id) === index
   );
 
-  console.log('Meals Debug:', {
-    totalPages: mealsInfiniteData?.pages?.length,
-    allMealsCount: allMeals.length,
-    uniqueMealsCount: meals.length,
-    duplicatesRemoved: allMeals.length - meals.length
-  });
+
 
   // Use stats from first page's API response, fallback to separate stats query, or empty stats
-  const apiStats = mealsInfiniteData?.pages?.[0]?.stats || separateStats;
+  const apiStats = mealsInfiniteData?.pages?.[0]?.stats
   const stats: MealStats = apiStats ? {
     ...apiStats,
     userMeals: apiStats.userMeals || 0, // Convert null to 0
@@ -115,40 +116,8 @@ export default function MealsScreen() {
     userMeals: 0,
   };
 
-  const mockUsers: User[] = [
-    { 
-      id: 1, 
-      name: 'John Doe', 
-      email: 'john@example.com',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: '2025-01-01'
-    },
-    { 
-      id: 2, 
-      name: 'Maria Smith', 
-      email: 'maria@example.com',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: '2025-01-01'
-    },
-    { 
-      id: 3, 
-      name: 'Ahmed Khan', 
-      email: 'ahmed@example.com',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: '2025-01-01'
-    },
-    { 
-      id: 4, 
-      name: 'Sarah Wilson', 
-      email: 'sarah@example.com',
-      role: 'USER',
-      status: 'ACTIVE',
-      createdAt: '2025-01-01'
-    },
-  ];
+  // Get dynamic filter data with fallbacks
+  const users = filterOptions?.users || [];
 
   // Event handlers
   const handleAddMeal = () => {
@@ -220,20 +189,10 @@ export default function MealsScreen() {
     // React Query will automatically refetch due to dependency change
   };
 
-  const handleToggleMyMeals = () => {
-    setShowOnlyMyMeals(!showOnlyMyMeals);
-    setSelectedUser(null); // Clear user filter when toggling my meals
-    // React Query will automatically refetch due to dependency change
-  };
-
-  const handleSortChange = (newSortBy: 'date' | 'type' | 'user') => {
-    setSortBy(newSortBy);
-    // React Query will automatically refetch due to dependency change
-  };
-
-  const handleSortOrderChange = (newOrder: 'asc' | 'desc') => {
-    setSortOrder(newOrder);
-    // React Query will automatically refetch due to dependency change
+  const handleMealFiltersChange = (newFilters: MealFilters) => {
+    setMealFilters(newFilters);
+    // TODO: Apply these filters to the meal query
+    console.log('New meal filters:', newFilters);
   };
 
   const handleClearFilters = () => {
@@ -305,22 +264,10 @@ export default function MealsScreen() {
         {/* Filters */}
         {showFilters && (
           <MealFiltersCard
-            selectedMonth={selectedMonth}
-            showOnlyMyMeals={showOnlyMyMeals}
-            selectedUser={selectedUser}
-            sortBy={sortBy}
-            sortOrder={sortOrder}
-            isAdmin={isAdmin}
-            users={mockUsers.map(u => ({ 
-              id: u.id, 
-              name: u.name || u.email.split('@')[0], 
-              email: u.email 
-            }))}
-            onMonthPickerOpen={() => setShowMonthPicker(true)}
-            onUserPickerOpen={() => setShowUserPicker(true)}
-            onToggleMyMeals={handleToggleMyMeals}
-            onSortByChange={handleSortChange}
-            onSortOrderChange={handleSortOrderChange}
+            filters={mealFilters}
+            filterOptions={filterOptions}
+            onFiltersChange={handleMealFiltersChange}
+            style={{ marginBottom: 16 }}
           />
         )}
       </View>
@@ -361,7 +308,7 @@ export default function MealsScreen() {
       {/* User Picker Modal */}
       <UserPicker
         visible={showUserPicker}
-        users={mockUsers.map(u => ({ 
+        users={users.map((u: any) => ({ 
           id: u.id, 
           name: u.name || u.email.split('@')[0], 
           email: u.email 

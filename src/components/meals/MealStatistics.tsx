@@ -154,7 +154,7 @@ export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps
           </View>
         </Card>
         
-        {/* <Card style={{ 
+        <Card style={{ 
           flex: 1, 
           padding: 12,
           backgroundColor: colors.background.primary,
@@ -167,7 +167,7 @@ export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps
           <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary[600] }}>
             {stats.totalMeals}
           </Text>
-        </Card> */}
+        </Card>
         
         <Card style={{ 
             flex: 1, 

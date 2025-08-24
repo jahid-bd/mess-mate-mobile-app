@@ -7,14 +7,15 @@ import {
   ExpensesList,
   ExpenseEntry,
   ExpenseStats,
-  ExpenseFilters,
-  User
+  ExpenseFilters
 } from '../../src/components/expenses';
 import { useThemeColors } from '../../src/hooks/useThemeColors';
+import { useFilterOptions } from '../../src/hooks/useFilterOptions';
 import { HeaderWithLogo } from '@/src/components/HeaderWithLogo';
 
 export default function ExpensesScreen() {
   const colors = useThemeColors();
+  const { data: filterOptions } = useFilterOptions();
   
   // Mock data - replace with actual API calls
   const currentUserId = 1;
@@ -27,13 +28,8 @@ export default function ExpensesScreen() {
     searchQuery: ''
   });
 
-  // Mock users data
-  const users: User[] = [
-    { id: 1, name: 'John Doe', email: 'john@example.com' },
-    { id: 2, name: 'Maria Smith', email: 'maria@example.com' },
-    { id: 3, name: 'Ahmed Khan', email: 'ahmed@example.com' },
-    { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com' },
-  ];
+  // Get dynamic filter data with fallbacks
+  const users = filterOptions?.users || [];
 
   // Mock expenses data
   const expenses: ExpenseEntry[] = [

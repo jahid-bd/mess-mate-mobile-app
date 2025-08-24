@@ -7,6 +7,9 @@ export { MealsHeader } from './MealsHeader';
 export { MealListSkeleton } from './MealListSkeleton';
 export { MealListError } from './MealListError';
 
+// Re-export types from MealFiltersCard
+export type { MealFilters } from './MealFiltersCard';
+
 // Export types for better reusability
 export interface MealEntry {
   id: number;
