@@ -9,7 +9,7 @@ import { FilterOptions } from '../../hooks/useFilterOptions';
 
 export interface MealFilters {
   selectedMonth: string;
-  selectedUserId: number | null;
+  selectedUserId: number | undefined;
   selectedType: 'ALL' | 'BREAKFAST' | 'LUNCH' | 'DINNER';
   searchQuery: string;
 }
@@ -282,7 +282,7 @@ export function MealFiltersCard({
         variant="outline"
         onPress={() => onFiltersChange({
           selectedMonth: new Date().toISOString().slice(0, 7),
-          selectedUserId: null,
+          selectedUserId: undefined,
           selectedType: 'ALL',
           searchQuery: ''
         })}

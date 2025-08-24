@@ -60,12 +60,7 @@ export function MealsList({
 }: MealsListProps) {
   const colors = useThemeColors();
 
-  console.log('MealsList Pagination Debug:', {
-    mealsCount: meals.length,
-    hasNextPage,
-    isFetchingNextPage,
-    onLoadMoreExists: !!onLoadMore
-  });
+
 
   const canEditMeal = (meal: MealEntry) => {
     return isAdmin || meal.userId === currentUserId;
@@ -135,11 +130,7 @@ export function MealsList({
   };
 
   const renderFooter = () => {
-    console.log('MealsList renderFooter Debug:', {
-      hasNextPage,
-      isFetchingNextPage,
-      mealsLength: meals.length
-    });
+
 
     if (!hasNextPage && !isFetchingNextPage) {
       return null;

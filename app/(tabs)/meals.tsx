@@ -7,8 +7,6 @@ import { useAuthStore } from '../../src/stores/authStore';
 import { useInfiniteMealsQuery } from '../../src/hooks/useMealsQuery';
 import { useDeleteMealMutation } from '../../src/hooks/useMealMutations';
 import { useFilterOptions } from '../../src/hooks/useFilterOptions';
-import { MonthPicker } from '../../src/components/MonthPicker';
-import { UserPicker } from '../../src/components/UserPicker';
 import { MealActionModal } from '../../src/components/MealActionModal';
 import { Toast } from '../../src/components/Toast';
 import { MealEntry } from '../../src/types/api';
@@ -33,21 +31,16 @@ export default function MealsScreen() {
   // New unified filter state
   const [mealFilters, setMealFilters] = useState<MealFilters>({
     selectedMonth: new Date().toISOString().slice(0, 7), // Current month
-    selectedUserId: null,
+    selectedUserId: undefined,
     selectedType: 'ALL',
     searchQuery: ''
   });
+
+  console.log("selected month:", mealFilters.selectedMonth  );  
   
   // State management
-  const [selectedMonth, setSelectedMonth] = useState('2025-08');
-  const [showOnlyMyMeals, setShowOnlyMyMeals] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<'date' | 'type' | 'user'>('date');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [showMonthPicker, setShowMonthPicker] = useState(false);
-  const [showUserPicker, setShowUserPicker] = useState(false);
   const [showActionModal, setShowActionModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<MealEntry | null>(null);
   const [toast, setToast] = useState<{
@@ -60,7 +53,7 @@ export default function MealsScreen() {
     type: 'info',
   });
 
-  console.log("selected month:", selectedMonth);
+
 
   // Mutation hooks
   const deleteMealMutation = useDeleteMealMutation();
@@ -84,13 +77,12 @@ export default function MealsScreen() {
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteMealsQuery({
-    month: selectedMonth,
-    userId: showOnlyMyMeals ? user?.id : (selectedUser || undefined),
-    sortBy,
-    order: sortOrder,
-    includeStats: true, // Request stats with the meals data
+    month: mealFilters.selectedMonth,
+    userId: mealFilters.selectedUserId,
+    includeStats: true,
   });
 
+  console.log("Meals data:", mealsInfiniteData);
 
 
   // Extract meals from infinite query pages and deduplicate by ID
@@ -116,8 +108,6 @@ export default function MealsScreen() {
     userMeals: 0,
   };
 
-  // Get dynamic filter data with fallbacks
-  const users = filterOptions?.users || [];
 
   // Event handlers
   const handleAddMeal = () => {
@@ -178,16 +168,7 @@ export default function MealsScreen() {
     }
   };
 
-  // Filter change handlers that trigger new API calls
-  const handleMonthChange = (month: string) => {
-    setSelectedMonth(month);
-    // React Query will automatically refetch due to dependency change
-  };
 
-  const handleUserFilterChange = (userId: number | null) => {
-    setSelectedUser(userId);
-    // React Query will automatically refetch due to dependency change
-  };
 
   const handleMealFiltersChange = (newFilters: MealFilters) => {
     setMealFilters(newFilters);
@@ -195,17 +176,7 @@ export default function MealsScreen() {
     console.log('New meal filters:', newFilters);
   };
 
-  const handleClearFilters = () => {
-    setSelectedUser(null);
-    setShowOnlyMyMeals(false);
-    setSortBy('date');
-    setSortOrder('desc');
-    // Month is not cleared as it's usually the primary filter
-  };
 
-  // Check if any filters are active (excluding month and default sort)
-  const hasActiveFilters = selectedUser !== null || showOnlyMyMeals || 
-    sortBy !== 'date' || sortOrder !== 'desc';
 
   // Since we're using server-side filtering and sorting, we can use meals directly
   const filteredMeals = meals;
@@ -223,43 +194,6 @@ export default function MealsScreen() {
           onToggleFilters={() => setShowFilters(!showFilters)}
         />
 
-        {/* Active Filters Indicator */}
-        {hasActiveFilters && (
-          <View style={{ 
-            flexDirection: 'row', 
-            alignItems: 'center', 
-            justifyContent: 'space-between',
-            backgroundColor: colors.primary[50],
-            padding: 12,
-            borderRadius: 8,
-            marginBottom: 16,
-            borderWidth: 1,
-            borderColor: colors.primary[200]
-          }}>
-            <View style={{ flex: 1 }}>
-              <ButtonText style={{ 
-                fontSize: 14, 
-                color: colors.primary[700],
-                fontWeight: '500'
-              }}>
-                Filters Active: {[
-                  selectedUser && 'User',
-                  showOnlyMyMeals && 'My Meals',
-                  sortBy !== 'date' && `Sort: ${sortBy}`,
-                  sortOrder !== 'desc' && 'Ascending'
-                ].filter(Boolean).join(', ')}
-              </ButtonText>
-            </View>
-            <Button 
-              action="primary" 
-              variant="outline" 
-              size="sm"
-              onPress={handleClearFilters}
-            >
-              <ButtonText>Clear</ButtonText>
-            </Button>
-          </View>
-        )}
 
         {/* Filters */}
         {showFilters && (
@@ -282,7 +216,7 @@ export default function MealsScreen() {
       <MealsList
         meals={isLoading || isError ? [] : (filteredMeals as any)} // Show empty array while loading
         currentUserId={user?.id}
-        showOnlyMyMeals={showOnlyMyMeals}
+        showOnlyMyMeals={user?.id === mealFilters.selectedUserId}
         isAdmin={isAdmin}
         isLoading={isLoading}
         isRefreshing={isRefreshing}
@@ -297,26 +231,6 @@ export default function MealsScreen() {
         isFetchingNextPage={isFetchingNextPage}
       />
 
-      {/* Month Picker Modal */}
-      <MonthPicker
-        visible={showMonthPicker}
-        selectedMonth={selectedMonth}
-        onSelect={handleMonthChange}
-        onClose={() => setShowMonthPicker(false)}
-      />
-
-      {/* User Picker Modal */}
-      <UserPicker
-        visible={showUserPicker}
-        users={users.map((u: any) => ({ 
-          id: u.id, 
-          name: u.name || u.email.split('@')[0], 
-          email: u.email 
-        }))}
-        selectedUserId={selectedUser}
-        onSelect={handleUserFilterChange}
-        onClose={() => setShowUserPicker(false)}
-      />
 
       {/* Meal Action Modal */}
       <MealActionModal

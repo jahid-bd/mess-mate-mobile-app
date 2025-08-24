@@ -5,7 +5,7 @@ import { MealEntry, PaginatedResponse, MealStats } from '../types/api';
 interface UseMealsQueryParams {
   month?: string;
   limit?: number;
-  userId?: number;
+  userId?: number
   sortBy?: string;
   order?: 'asc' | 'desc';
   offset?: number;

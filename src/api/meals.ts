@@ -17,6 +17,8 @@ export const mealApi = {
     order?: 'asc' | 'desc';
     includeStats?: boolean;
   }): Promise<PaginatedResponse<MealEntry> & { stats?: MealStats }> => {
+
+    console.log("params", params);
     const response = await api.get('/meal-entries', { params });
     return response.data;
   },
