@@ -154,7 +154,7 @@ export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps
           </View>
         </Card>
         
-        <Card style={{ 
+        {/* <Card style={{ 
           flex: 1, 
           padding: 12,
           backgroundColor: colors.background.primary,
@@ -167,9 +167,9 @@ export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps
           <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.primary[600] }}>
             {stats.totalMeals}
           </Text>
-        </Card>
+        </Card> */}
         
-        {/* <Card style={{ 
+        <Card style={{ 
             flex: 1, 
             padding: 12,
             backgroundColor: colors.background.primary,
@@ -177,12 +177,12 @@ export function MealStatistics({ stats, isLoading = false }: MealStatisticsProps
             borderColor: colors.border.primary
           }}>
             <Text style={{ fontSize: 12, color: colors.text.secondary, marginBottom: 4 }}>
-              My Month
+              My Meals
             </Text>
             <Text style={{ fontSize: 16, fontWeight: 'bold', color: colors.warning[600] }}>
               {stats.userMeals}
             </Text>
-          </Card> */}
+          </Card>
       </View>
     </View>
   );
